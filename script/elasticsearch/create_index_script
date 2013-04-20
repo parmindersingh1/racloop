@@ -1,0 +1,93 @@
+curl -XPOST localhost:9200/static_pages
+curl -XPOST localhost:9200/user_informations
+curl -XPOST localhost:9200/saved_records
+
+curl -XPUT 'http://localhost:9200/static_pages/static_pages/_mapping' -d '
+{
+  "static_pages": {
+      "properties": {
+        "user_name": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "from_location": {
+          "type": "geo_point"
+        },
+        "to": {
+          "type": "string"
+        },
+        "to_location": {
+          "type": "geo_point"
+        },
+        "date_at": {
+          "type": "date"
+        },
+        "have_car": {
+          "type": "boolean"
+        },
+        "distance_time": {
+          "type": "string"
+        }
+      }
+    }
+}'
+
+curl -XPUT 'http://localhost:9200/user_informations/user_information/_mapping' -d '
+
+{
+    "user_information": {
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "boost": 2.0
+        },
+        "user_name": {
+          "type": "string",
+          "analyzer": "snowball"
+        },
+        "date_of_birth": {
+          "type": "date"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    }
+}'
+
+
+
+
+curl -XPUT 'http://localhost:9200/saved_records/saved_record/_mapping' -d '
+ {
+    "saved_record": {
+      "properties": {
+        "user_name": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "from_location": {
+          "type": "geo_point"
+        },
+        "to": {
+          "type": "string"
+        },
+        "to_location": {
+          "type": "geo_point"
+        }
+      }
+    }
+  }'
+
+
+

@@ -1,0 +1,3 @@
+curl -XDELETE 'http://localhost:9200/user_informations/'
+curl -XDELETE 'http://localhost:9200/static_pages/'
+curl -XDELETE 'http://localhost:9200/saved_records/'

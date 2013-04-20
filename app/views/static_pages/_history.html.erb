@@ -1,0 +1,32 @@
+<div class="tab-pane active" id="home">		
+	<div id="loading_near" class="loading">
+    <img src="/assets/loading.gif" alt="loading" />
+    </div>
+	
+					<%unless @history.empty?%>
+					<table class="condensed-table" id="table_history">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>From</th>
+								<th>To</th>
+								<th>@</th>
+							</tr>
+						</thead>
+						<tbody>
+						 
+						<% @history.each do |hist|%>
+						<tr>
+							   	<td><%=hist.user_name%></td>
+								<td><%=hist.from%></td>
+								<td><%=hist.to%></td>								
+								<td><%=(Time.zone.parse(hist.date_at).localtime).strftime("%m/%d/%y, %I:%M %p")%></td>												
+					    </tr>
+						  <%end%>
+											
+						</tbody>
+					</table>
+					<%else%>
+					<h5>Sorry! No Records Found</h5>
+					<%end%>
+</div>

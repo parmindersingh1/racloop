@@ -1,0 +1,102 @@
+<div id="loading_home" class="loading">
+    <img src="/assets/loading.gif" alt="loading" />
+</div>
+<div class="row">
+    <div class="span4">
+        <%#= <%= render 'layouts/branding' %>
+        <div class="sidebar">
+            <section id="forms">
+                <%= render 'layouts/form' %>
+            </section>
+        </div>
+        <div class="sidebar" id="request_div">
+            <%= render 'layouts/sidebar' %>
+        </div>
+    </div>
+    <div class="span8">        
+        <div id="main-canvas">
+            <% if authenticated? %>
+                <%= render 'layouts/map' %>
+            <% else %>
+                <%= render 'layouts/message' %>
+            <% end %>            
+            <%#= render 'layouts/map' %>
+            <ul class="tabs" id="main-tabs">
+                <li class="active">
+                    <a href="#home" id="People_near">People near you</a>
+                </li>
+                <li>
+                    <a href="#responses" id="my_responses">My Responses (3)</a>
+                </li>
+                <li class="dropdown" data-dropdown="dropdown">
+                    <a href="#" class="dropdown-toggle" id="setting-toggle">Setting</a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#ignored" id="ignored">Ignored User</a>
+                        </li>
+                        <li>
+                            <a href="#invisible" id="invisible">Invisible</a>
+                        </li>
+                        <li>
+                            <a href="#savelist1" id="savelist">Favourites</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#other" id="other">Other Setting</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" id="history">History</a>
+                </li>
+            </ul>
+            <div class="tab-content">                
+                <div class="tab-pane" id="responses">
+                    <table class="condensed-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>@</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Sandeep Kumar</th>
+                                <td>Gurgaon</td>
+                                <td>Delhi</td>
+                                <td>Feb 7, 12:30 P.M.</td>
+                                <td>
+                                <div class="alert-actions">
+                                    <a class="btn small" href="#">Send Message</a>
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <th>Vinay Kohli</th>
+                                <td>Gurgaon</td>
+                                <td>Gaziabad</td>
+                                <td>Feb 8, 8:30 A.M.</td>
+                                <td>
+                                <div class="alert-actions">
+                                    <a class="btn small disabled" href="#">Send Message</a>
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <th>Monica Arora</th>
+                                <td>Gurgaon</td>
+                                <td>Noida</td>
+                                <td>Feb 7, 6:30 P.M.</td>
+                                <td>
+                                <div class="alert-actions">
+                                    <a class="btn small" href="#">Send Message</a>
+                                </div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>                    
+    </div>
+</div>
+

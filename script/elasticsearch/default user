@@ -1,0 +1,45 @@
+curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
+{
+    "user_id": "100005196784043",
+    "user_name": "Rajan Punchouty",
+   
+    "email": "rajan.punchouty@gmail.com"
+}'
+
+curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
+{
+    "user_id": "100000455972792",
+    "user_name": "Pardeep Saini",
+    
+    "email": "pardeep@ezzie.in"
+}'
+
+curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
+{
+    "user_id": "100002283355067",
+    "user_name": "Anu Sharma",
+    
+    "email": "anu@ezzie.in"
+}'
+
+
+curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
+{
+    "user_id": "100001279621894",
+    "user_name": "Kamal Preet Kaur",
+   
+    "email": "kamalpreet@ezzie.in"
+}'
+
+
+curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
+{
+    "user_id": "100005735493567",
+    "user_name": "Parminder Singh",
+   
+    "email": "parminder@ezzie.in"
+}'
+
+
+
+

@@ -1,0 +1,13 @@
+<div class="hero-unit">
+	<h1>Share a Drive</h1>
+	<p>
+		Meet new people, Make new friends and Drive together. Help in promoting Clean and Pollution free World.
+	</p>
+	<p>
+		<% if authenticated? %>
+		  <p><%= link_to "Logout", facebook_path, method: :delete, class: "btn primary" %></p>
+		<% else %>
+			<fb:login-button length="long" onlogin="location.href='<%= facebook_path %>'" scope="<%= Facebook.config[:scope] %>"></fb:login-button>
+		<% end %>		
+	</p>
+</div>

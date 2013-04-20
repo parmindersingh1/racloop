@@ -1,0 +1,42 @@
+<div class="tab-pane active" id="home">
+					<div id="loading_near" class="loading">
+    <img src="/assets/loading.gif" alt="loading" />
+                   </div>			
+					<%unless @near_loc.empty?%>
+					<table class="condensed-table" id="table_people">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>From</th>
+								<th>To</th>
+								<th>@</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+						 
+						<% @near_loc.each do |loc|%>
+						<tr>							   
+								<td><%=loc.user_name%></td>
+								<td><%=loc.from%></td>
+								<td><%=loc.to%></td>								
+								<td><%=(Time.zone.parse(loc.date_at).localtime).strftime("%m/%d/%y, %I:%M %p")%></td>
+								<%if loc.have_car=="true"%>
+								<td><div class="alert-actions">
+                                    <a class="btn small" href="#">Contact</a>
+                                </div></td>	
+                                <%else%>
+                                <td><div class="alert-actions">
+                                    <a class="btn small disabled" href="#">Waiting</a>
+                                </div></td>
+                                <%end%>											
+					    </tr>
+						  <%end%>					 					  
+											
+						</tbody>
+						
+					</table>
+					<%else%>
+					<h5>Sorry! No Records Found</h5>
+					<%end%>
+</div>

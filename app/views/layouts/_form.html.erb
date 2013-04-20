@@ -1,0 +1,73 @@
+<form class="form-stacked" action="#" onsubmit="return false;" >
+	<fieldset>
+		<div class="clearfix">
+			<% if authenticated? %>
+			<label id="optionsCheckboxes">Welcome <%= current_user.profile.name %>! &nbsp; <%= link_to "Log Out", facebook_path, method: :delete, class: 'logout', :id=> "notyou"%></label>                   
+			<% else %>
+			<label id="optionsCheckboxes">Share a Drive</label>
+			<% end %>
+			<div class="input">
+				<ul class="inputs-list">
+					<li>
+						<label>
+							<input type="radio" name="optionsCheckboxes" value="option1" class="radio_button">
+							<span>I am driving</span> </label>
+					</li>
+					<li>
+						<label>
+							<input type="radio" name="optionsCheckboxes" value="option2" class="radio_button">
+							<span>I need someone to drive me</span> </label>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="clearfix">
+			<label for="from">From</label>
+			<div class="input">
+				<input class="span3" id="from" name="from" size="20" type="text" >
+			</div>
+		</div><!-- /clearfix -->
+
+		<div class="clearfix">
+			<label for="to">To</label>
+			<div class="input">
+				<input class="span3" id="to" name="to" size="20" type="text" >
+			</div>
+		</div><!-- /clearfix -->
+
+		<div class="clearfix">
+			<label>On</label>
+			<div class="input">
+				<div class="inline-inputs">
+					<input class="small datepicker " type="text" id="date_val" placeholder="Enter Date">
+					&nbsp;&nbsp;&nbsp;@
+					<div class="small bootstrap-timepicker pull">
+                    <input id="timepicker3" type="text" class="small" placeholder="Enter Time">
+                    </div> 
+					<!-- <input class="mini" type="text" value="12">
+					:
+					<input class="mini" type="text" value="15">
+					<input class="mini" type="text" value="PM"> -->
+				   <br><br> <span class="help-block" >Give other people enough time to plan</span>
+				</div>
+			</div>
+		</div><!-- /clearfix -->
+		<input id="from_coord" type="hidden" />
+		<input id="to_coord" type="hidden" />
+		<input id="distance_km" type="hidden" />
+		<input id="time_taken" type="hidden" />
+		<input id="reference" type="hidden" />
+		<input id="current" type="hidden" />
+		<div class="actions" id="actions_btn">
+            <center>	
+			<p>				
+				<input type="submit" class="btn primary" value="Submit">
+				&nbsp;&nbsp;&nbsp;
+				<button type="reset" class="btn" id="reset_btn">
+					Reset
+				</button>
+			</p>
+			</center>
+		</div>
+	</fieldset>
+</form>

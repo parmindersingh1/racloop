@@ -1,0 +1,30 @@
+<div class="tab-pane active" id="home">		
+	<div id="loading_near" class="loading">
+    <img src="/assets/loading.gif" alt="loading" />
+    </div>
+	
+					<%unless @saved.empty?%>
+					<table class="condensed-table" id="table_history">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>From</th>
+								<th>To</th>								
+							</tr>
+						</thead>
+						<tbody>
+						 
+						<% @saved.each do |list|%>
+						<tr>
+							   	<td><%=list.user_name%></td>
+								<td><%=list.from%></td>
+								<td><%=list.to%></td>																		
+					    </tr>
+						  <%end%>
+											
+						</tbody>
+					</table>
+					<%else%>
+					<h5>Sorry! No Records Found</h5>
+					<%end%>
+</div>

@@ -1,0 +1,15 @@
+development: &defaults
+  client_id: 397619040334182
+  client_secret: 18419ab8bdce77ce9e8dd9de99b58075
+  scope: email, xmpp_login, user_location, publish_stream, create_event
+  canvas_url: http://apps.facebook.com/racloop-qa
+
+test:
+  <<: *defaults
+
+production:
+  client_id: 528804070498204
+  client_secret: 0e6a93382f847977f8693a9a316cd33f
+  scope: email, xmpp_login, user_location, publish_stream, create_event
+  canvas_url: http://apps.facebook.com/racloop
+  
