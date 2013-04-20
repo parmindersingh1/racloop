@@ -73,7 +73,7 @@ class StaticPages
          string "user_id:#{params[:user_id]}"
        end         
        filter :range, date_at: {gt: Time.zone.now}      
-       sort { by :date_at, "desc" }
+       sort { by :date_at, "asc" }
      end     
    end  
    

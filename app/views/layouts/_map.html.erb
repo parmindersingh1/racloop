@@ -45,30 +45,23 @@
         callDialog(first,second);   
    });
    
-   function callDialog(first,second) {
-   	$.confirm({
-			'title'		: 'Route Confirmation',
-			'message'	: 'You are about to choose same Route?',
-			'buttons'	: {
-				'Yes'	: {
-					'class'	: 'blue',
-					'action': function(){					     
-                         input1.value=first;
-                         input2.value=second;
-                         callRoutes();   
-                      }   
-				  },
-				'No'	: {
-					'class'	: 'gray',
-					'action': function(){}	// Nothing to do in this case. You can as well omit the action property.
-				}
-			}	 	        
-	  });   	   	
+   function callDialog(first,second) {   				     
+             input1.value=first;
+             input2.value=second;
+             callRoutes();                        
   }
    
     $(document).on("click","#p_request",function() {
     	var first = $(this).attr("value1");     
         var second = $(this).attr("value2");
+        if($(this).attr("value3")=="car")
+        {
+        	document.getElementById('optionsCheckboxes_car').checked = true;
+        }
+        else
+        {
+        	document.getElementById('optionsCheckboxes_notcar').checked = true;
+        }
         callDialog(first,second);
 });
    
@@ -391,6 +384,8 @@
    	hideInitializing();
    	err.innerHTML = message;
    	$("#error_view").slideDown("slow");
+   	input1.value="";
+   	input2.value="";
    	setTimeout(function() {
    		 // err.innerHTML ="";
    	 $("#error_view").slideUp("slow");
