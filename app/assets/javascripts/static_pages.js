@@ -8,7 +8,7 @@ function callPeople() {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
-	}, 4000);
+	}, 8000);
 	$("li").removeClass("active");
 	$("#People_near").parent().addClass("active");
 	var n = ($("#current").val()).split(",");
@@ -27,7 +27,7 @@ function callrequest() {
 	$("#loading_responses").show();
 	setTimeout(function() {
 		$("#loading_responses").hide();
-	}, 4000);
+	}, 8000);
 	$.get("/requests", function(data) {
 		$("#loading_responses").hide();
 		$("#request_div").empty();
@@ -40,7 +40,7 @@ $(document).on("click", "#my_responses", function(event) {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
-	}, 4000);
+	}, 8000);
 	$("li").removeClass("active");
 	$(this).parent().addClass("active");
 	hideLoading();
@@ -51,7 +51,7 @@ $(document).on("click", "#People_near", function(event) {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
-	}, 4000);
+	}, 8000);
 	$("li").removeClass("active");
 	$(this).parent().addClass("active");
 	hideLoading();
@@ -62,7 +62,7 @@ $(document).on("click", "#history", function(event) {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
-	}, 4000);
+	}, 8000);
 	$("li").removeClass("active");
 	$(this).parent().addClass("active");
 	$.get("/history", function(data) {
@@ -76,7 +76,7 @@ $(document).on("click", "#savelist", function(event) {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
-	}, 4000);
+	}, 8000);
 	$("li").removeClass("active");
 	$(this).parent().addClass("active");
 	$.get("/savelist", function(data) {
@@ -90,7 +90,7 @@ $(document).on("click", "#invisible", function(event) {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
-	}, 4000);
+	}, 8000);
 	$("li").removeClass("active");
 	$(this).parent().addClass("active");
 	hideLoading();
@@ -101,7 +101,7 @@ $(document).on("click", "#ignored", function(event) {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
-	}, 4000);
+	}, 8000);
 	$("li").removeClass("active");
 	$(this).parent().addClass("active");
 	hideLoading();
@@ -112,7 +112,7 @@ $(document).on("click", "#other", function(event) {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
-	}, 4000);
+	}, 8000);
 	$("li").removeClass("active");
 	$(this).parent().addClass("active");
 	hideLoading();
@@ -159,7 +159,7 @@ $(document).on("submit", ".form-stacked", function(event) {
 		showLoading();
 		setTimeout(function() {
 			hideLoading();
-		}, 4000);
+		}, 8000);
 		$.post("/details", {
 			from : from,
 			to : to,
@@ -170,6 +170,8 @@ $(document).on("submit", ".form-stacked", function(event) {
 			have_car : have_car
 		}, function(data) {
 			hideLoading();
+			if(data!="No")
+		 {
 			inform_dialog("Saved.. the estimated time of journey is: " + obj + " Mins");
 			$(".tab-content").empty();
 			$(".tab-content").html(data);
@@ -177,7 +179,12 @@ $(document).on("submit", ".form-stacked", function(event) {
 			setTimeout(function() {
 				callrequest();
 			}, 1500);
-
+         }
+         else
+         {
+         	alert_dialog("sorry you already has maximum requests delete previous to proceed!!");
+         }
+           
 		});
 
 	}
@@ -310,7 +317,7 @@ $(document).on("click", "#save_button", function() {
 					$("#loading_home").show();
 					setTimeout(function() {
 						$("#loading_home").hide();
-					}, 4000);
+					}, 8000);
 
 					$.post("/saveroute", {
 						from : from,
@@ -344,28 +351,35 @@ $(document).on("click", "#save_button", function() {
 
 });
 
-$('.datepicker').each(function() {
-	var minDate = new Date();
-	minDate.setHours(0);
-	minDate.setMinutes(0);
-	minDate.setSeconds(0, 0);
+// $('.datepicker').each(function() {
+	// var minDate = new Date();
+	// minDate.setHours(0);
+	// minDate.setMinutes(0);
+	// minDate.setSeconds(0, 0);
+// 
+	// var $picker = $(this);
+	// $picker.datepicker();
+// 
+	// var pickerObject = $picker.data('datepicker');
+// 
+	// $picker.on('changeDate', function(ev) {
+		// if (ev.date.valueOf() < minDate.valueOf()) {
+			// alert('Nope');
+			// pickerObject.setValue(minDate);
+			// ev.preventDefault();
+			// return false;
+		// }
+	// });
+// });
 
-	var $picker = $(this);
-	$picker.datepicker();
+$(document).ready(function() {
+	var d1;
+	d1 = new Date();
+	var h;
+	h = (d1.getHours() + 1);
+	if (h > 12)
+		$("#timepicker3").val((h - 12) + ":" + d1.getMinutes() + " " + "PM");
+	else
+		$("#timepicker3").val(d1.getHours() + ":" + d1.getMinutes() + " " + "AM");
 
-	var pickerObject = $picker.data('datepicker');
-
-	$picker.on('changeDate', function(ev) {
-		if (ev.date.valueOf() < minDate.valueOf()) {
-
-			// Handle previous date
-			alert('Nope');
-			pickerObject.setValue(minDate);
-
-			// And this for later versions (in case)
-			ev.preventDefault();
-			return false;
-		}
-	});
 });
-

@@ -5,6 +5,7 @@ gem 'execjs'
 gem 'therubyracer'
 
 gem 'fb_graph'
+gem 'figaro', '0.6.3'
 
 gem "tire", '0.5.4'
 group :development, :test do

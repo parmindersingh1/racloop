@@ -1,408 +1,375 @@
-<div id="error_div"><center><h6 id="error_view" style="color:red"></h6></center></div>
-<div id="map_canvas"></div> 
-<% if authenticated? %>
+<div id="error_div">
+	<center>
+		<h6 id="error_view" style="color:red"></h6>
+	</center>
+</div>
+<div id="map_canvas"></div>
+
 <div id="save_route">
 	<center>
-	<p>
-	Save Route for later use: &nbsp;&nbsp;&nbsp;<input id="save_button" type="button" class="btn primary" value="Save" >
-	</p> 
+		<p>
+			Save Route for later use: &nbsp;&nbsp;&nbsp;
+			<input id="save_button" type="button" class="btn primary" value="Save" >
+		</p>
 	</center>
 </div>
 
 <div id="loading_map" class="loading" style="left: 57%; top: 20%;">
-    <img src="/assets/loading.gif" alt="loading" />
+	<img src="/assets/loading.gif" alt="loading" />
 </div>
-<%else%>
-<div id="loading_map" class="loading" style="left: 48%; top: 58%;">
-    <img src="/assets/loading.gif" alt="loading" />
-</div>  
-<script>$("#map_canvas").css("margin-bottom", "2px");</script>
-<%end%>  
 
 <script>
-    var geocoder;
-    var directionDisplay;
-    var directionsService = new google.maps.DirectionsService();
-    var map;
-    var marker;
-    var place1="";
-    var place2="";
-    var input1=document.getElementById("from");
-    var input2=document.getElementById("to");
-    var start_coord=document.getElementById("from_coord");
-    var end_coord=document.getElementById("to_coord");
-    var err = document.getElementById("error_view");
-    var country1="";
-    var country2="";    
-    var markersArray = [];
-    
-    initGeolocation();
-    callauto();
-      
-   $(document).on("click","#table_history tbody tr",function() {      
-        var first = $(this).find("td").slice(1,2).text();     
-        var second = $(this).find("td").slice(2,3).text();     
-        callDialog(first,second);   
-   });
-   
-   function callDialog(first,second) {   				     
-             input1.value=first;
-             input2.value=second;
-             callRoutes();                        
-  }
-   
-    $(document).on("click","#p_request",function() {
-    	var first = $(this).attr("value1");     
-        var second = $(this).attr("value2");
-        if($(this).attr("value3")=="car")
-        {
-        	document.getElementById('optionsCheckboxes_car').checked = true;
-        }
-        else
-        {
-        	document.getElementById('optionsCheckboxes_notcar').checked = true;
-        }
-        callDialog(first,second);
-});
-   
-      $(function() {
-    $("#from").bind("keypress", function(e) {
-            if (e.keyCode == 13)
-            {
-                $(this).blur();
-                $("#to").focus();
-            }            
-      });
- 
-});
-
-    $(function() {
-    $("#to").bind("keypress", function(e) {
-            if (e.keyCode == 13)
-            {
-                $(this).blur();
-                $("#date_val").focus();
-            }
-      });
- 
-});
-      
-      $(document).on("click","#reset_btn",function() {
-        initGeolocation();
-        country1="";
-        country2="";
-        callauto();
-        
-});
-    
-    
-      $(document).on("focus","#from",function(){
-          $(this).val("");
-          $("#error_view").slideUp("fast");
-          $("#error_view").empty();          
-          setTimeout(function() {callRoutes();},600);
-      });
-      
-      $(document).on("focus","#to",function(){
-          $(this).val("");
-          $("#error_view").slideUp("fast");
-          $("#error_view").empty();
-          setTimeout(function() {callRoutes();},600);
-      });
-      
-      
-      $(document).on("blur","#from",function(){
-          setTimeout(function() {callRoutes();},600);
-      });
- 
-      $(document).on("blur","#to",function(){
-           setTimeout(function() {callRoutes();},600);
-      });           
-      
-    function  callRoutes(){     
-    	showInitializing();
-    	$("#save_route").fadeOut("fast");
-        $("#map_canvas").css("margin-bottom", "");
-    	setTimeout(function() {hideInitializing();},4000);
-        if((input1.value!="") && (input2.value!=""))        
-        {  
-            place1="";
-            place2="";
-            codeAddress();
-        }
-        else if((input1.value!="" ) && (input2.value ==""))
-        {            
-             directionsDisplay.setMap(null);
-            var address1 = input1.value;
-            var loc = getlonglat(address1);             
-            setTimeout(function(){auto(input2,loc[2])},600);        
-            setTimeout(function(){changeMarkerPosition(loc);},800);
-        }
-        else if((input2.value!="" ) && (input1.value ==""))
-        {
-            
-            directionsDisplay.setMap(null);
-            var address2 = input2.value;
-            var loc = getlonglat(address2);            
-            setTimeout(function(){auto(input1,loc[2])},600);            
-            setTimeout(function(){changeMarkerPosition(loc);},800);
-        }
-        
-       	else if((input2.value =="" ) && (input1.value ==""))
-        {               
-            initGeolocation();
-        }
-      
-      }
-    
-    function changeMarkerPosition(loc) {   
-        
-      var latlng = new google.maps.LatLng(loc[0],loc[1]);          
-      marker.setPosition(latlng);
-      map.setCenter(latlng);
-      hideInitializing();
-     }
-
-    function initGeolocation() {
-    	showInitializing(); 
-    	setTimeout(function() {hideInitializing();},4000);
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(success, fail);
-        } else {
-            errorDisplay("Sorry, your browser does not support geolocation services.");
-        }
-    }
-
-    function success(position) {    	
-        geocoder = new google.maps.Geocoder();        
-        directionsDisplay = new google.maps.DirectionsRenderer({'draggable':true});
-        coords = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-        var myOptions = {
-            zoom : 12,
-            mapTypeId : google.maps.MapTypeId.ROADMAP,
-            center : coords
-        }
-        var lat_long=coords.toString();        
-        lat_long=lat_long.replace(/[()]/g,'');
-        $("#current").val(lat_long);        
-        var n=lat_long.split(",");               
-        map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-        
-        marker = new google.maps.Marker();        
-        marker.setPosition(coords);
-        marker.setMap(map);      
-        directionsDisplay.setMap(map);
-         $.get("/search",{lat:n[0], lon:n[1] },function(data){          	
-         	var response;
-         	var result;
-         	var n;
-         	var date;
-         	var show;
-         	var range;         	
-         	if(data.length>5)
-         	{
-         		range=5;
-         	}
-         	else
-         	{
-         		range=data.length;
-         	}
-         	if(range==0)
-         	{
-         		hideInitializing();
-         	}
-         	for(i=0; i<range; i++)
-        	{
-        		response=JSON.stringify(data[i]);       
-        	    result = jQuery.parseJSON(response);
-                n=result.from_location.split(",");                
-                date = new Date(result.date_at);                               
-                var hours = date.getHours();
-                var minutes = date.getMinutes();
-                var ampm = hours >= 12 ? 'pm' : 'am';
-                hours = hours % 12;
-                hours = hours ? hours : 12; // the hour '0' should be '12'
-                minutes = minutes < 10 ? '0'+minutes : minutes;                               
-                show="<center><b>"+result.user_name+"</b> is going <br>From: <b>"+result.from+"</b>  <br> To: <b>"+result.to+"</b><br> on <b>"+(date.getDate() + "-" + (date.getMonth()+1) + "-" + date.getFullYear() + "</b> at <b> " +  hours + ':' + minutes + ' ' + ampm)+"</b></center>";
-                addMarker(n[0],n[1],show);     
-                hideInitializing();          
-        	}
-        });
-    }
-    	
-    function addMarker(lat, lng, data) {        
-    var marker = new google.maps.Marker({
-      position: new google.maps.LatLng(lat, lng),
-      map: map,
-      icon: '/assets/car-rental-google-map-marker.png'       
-    });    
-    markersArray.push(marker);
-    var boxText = document.createElement("div");
-        boxText.style.cssText = "border: none; margin-top: 6px; background:#FFB894; color: black; padding: 5px;";
-        boxText.innerHTML = data;
-
-        var myOptions = {
-             content: boxText
-            ,disableAutoPan: false
-            ,maxWidth: 0
-            ,pixelOffset: new google.maps.Size(-140, 0)
-            ,zIndex: null
-            ,boxStyle: {                
-              background: "url('/assets/tipbox.gif') no-repeat"
-              ,opacity: 0.90
-              ,width: "280px"
-             }            
-        };
-        
-        var ib = new InfoBox();
-        google.maps.event.addListener(marker, "mouseover", function (e) {
-            ib.close();
-            ib.setOptions(myOptions)
-            ib.open(map, this);
-          });
-            
-         google.maps.event.addListener(marker, "mouseout", function (e) {
-            ib.close();
-          });   
-  }
-
-   function clearOverlays() {
-     for (var i = 0; i < markersArray.length; i++ ) {
-      markersArray[i].setMap(null);
-     }
-   }
-
-    function calcRoute(startloc, endloc) { 
-    	 clearOverlays();
-         directionsDisplay.setMap(map);
-        var start = new google.maps.LatLng(startloc[0], startloc[1]);
-        var end = new google.maps.LatLng(endloc[0], endloc[1]);
-        
-        start_coord.value=start;
-        end_coord.value=end;
-    
-        var request = {
-            origin : start,
-            destination : end,
-            travelMode : google.maps.DirectionsTravelMode.DRIVING
-        };
-        directionsService.route(request, function(result, status) {
-            if (status == google.maps.DirectionsStatus.OK) {                
-                 // Display the distance:
-                $("#distance_km").val(result.routes[0].legs[0].distance.value/1000);
-         // Display the duration:
-                $("#time_taken").val(result.routes[0].legs[0].duration.value);
-                
-                directionsDisplay.setDirections(result);
-                 $("#save_route").fadeIn("fast");
-                 $("#map_canvas").css("margin-bottom", "2px");
-               }
-                else
-                {
-                    errorDisplay("error:   " + status);
-                
-                }
-                markersArray=[];                
-                hideInitializing();
-        });
-                
-    }
-
-    function getlonglat(address) {
-        var loc3 = []
-        geocoder.geocode({
-            'address' : address
-        }, function(results, status) {
-
-            if (status == google.maps.GeocoderStatus.OK) {
-                loc3[0] = results[0].geometry.location.lat();
-                loc3[1] = results[0].geometry.location.lng();
-                                                
-            for (var i=0; i<results[0].address_components.length; i++) {
-            for (var b=0;b<results[0].address_components[i].types.length;b++) {
-
-                if (results[0].address_components[i].types[b] == "country") {
-                    loc3[2]=results[0].address_components[i].short_name;
-                    break;
-                }
-            }
-        }
-            } else {
-            	errorDisplay("Either From: or To: field is empty or invalid");
-                
-            }
-        });
-        return loc3;
-    }
-
-    function codeAddress() {
-        var address1 = input1.value;
-        var address2 = input2.value;            
-        var loc1 = getlonglat(address1);
-        var loc2 = getlonglat(address2);
-          setTimeout(function() {
-              calcRoute(loc1, loc2);
-           }, 1500);
-                
-    }
-
-    function fail() {        
-        errorDisplay("An unknown error occurred.");
-    }
-
-   function auto(txt,countryy) {
-       
-       if(countryy!="")
-       {
-        var options = {           
-            componentRestrictions: {country: countryy}
-        };
-       }
-    var autocomplete = new google.maps.places.Autocomplete(txt, options);
-       google.maps.event.addListener(autocomplete, 'place_changed', function() {
-    var place = autocomplete.getPlace();
-    if(txt.id=="from")
-    {
-        place1=place;
-    }    
-    else
-    {
-        place2=place;
-    }
-    console.log(place.address_components);
-    });
-   }
-   
-   function callauto()
-   {
-    auto(input1,country1);
-    auto(input2,country2);
-   }
-   
-   function errorDisplay(message)
-   {
-   	hideInitializing();
-   	err.innerHTML = message;
-   	$("#error_view").slideDown("slow");
-   	input1.value="";
-   	input2.value="";
-   	setTimeout(function() {
-   		 // err.innerHTML ="";
-   	 $("#error_view").slideUp("slow");
-   	}, 4000);
-   }
-   
-function hideInitializing() {    
-    $("#loading_map").hide();    
-}
-
-function showInitializing() { 
-    $("#loading_map").show();
-}
-
-
-$(document).ready(function(event){	
+	var geocoder;
+	var directionsDisplay = new google.maps.DirectionsRenderer();
+	var directionsService = new google.maps.DirectionsService();
+	var map;
+	var marker;
+	var place1 = "";
+	var place2 = "";
+	var input1 = document.getElementById("from");
+	var input2 = document.getElementById("to");
+	var start_coord = document.getElementById("from_coord");
+	var end_coord = document.getElementById("to_coord");
+	var err = document.getElementById("error_view");
+	var country1 = "";
+	var country2 = "";
+	var markersArray = [];
+	var attempt=0;
 	
-});
+	initGeolocation();
+	callauto();
 
-</script>         
+	$(document).on("click", "#table_history tbody tr", function() {
+		var first = $(this).find("td").slice(1, 2).text();
+		var second = $(this).find("td").slice(2, 3).text();
+		callDialog(first, second);
+	});
+
+	function callDialog(first, second) {
+		input1.value = first;
+		input2.value = second;
+		callRoutes();
+	}
+
+
+	$(document).on("click", "#p_request", function() {
+		var first = $(this).attr("value1");
+		var second = $(this).attr("value2");
+		if ($(this).attr("value3") == "car") {
+			document.getElementById('optionsCheckboxes_car').checked = true;
+		} else {
+			document.getElementById('optionsCheckboxes_notcar').checked = true;
+		}
+		callDialog(first, second);
+	});
+
+	$(function() {
+		$("#from").bind("keypress", function(e) {
+			if (e.keyCode == 13) {
+				$(this).blur();
+				$("#to").focus();
+			}
+		});
+
+	});
+
+	$(function() {
+		$("#to").bind("keypress", function(e) {
+			if (e.keyCode == 13) {
+				$(this).blur();
+				$("#date_val").focus();
+			}
+		});
+
+	});
+
+	$(document).on("click", "#reset_btn", function() {
+		initGeolocation();
+		country1 = "";
+		country2 = "";
+		callauto();
+
+	});
+
+	$(document).on("focus", "#from", function() {
+		$(this).val("");
+		$("#error_view").slideUp("fast");
+		$("#error_view").empty();
+		setTimeout(function() {
+			callRoutes();
+		}, 600);
+	});
+
+	$(document).on("focus", "#to", function() {
+		$(this).val("");
+		$("#error_view").slideUp("fast");
+		$("#error_view").empty();
+		setTimeout(function() {
+			callRoutes();
+		}, 600);
+	});
+
+	$(document).on("blur", "#from", function() {
+		setTimeout(function() {
+			callRoutes();
+		}, 600);
+	});
+
+	$(document).on("blur", "#to", function() {
+		setTimeout(function() {
+			callRoutes();
+		}, 600);
+	});
+
+	function callRoutes() {
+		showInitializing();
+		$("#save_route").fadeOut("fast");
+		$("#map_canvas").css("margin-bottom", "");
+		setTimeout(function() {
+			hideInitializing();
+		}, 8000);
+		if ((input1.value != "") && (input2.value != "")) {
+			place1 = "";
+			place2 = "";
+			codeAddress();
+		} else if ((input1.value != "" ) && (input2.value == "")) {
+			directionsDisplay.setMap(null);
+			var address1 = input1.value;
+			var loc = getlonglat(address1);
+			setTimeout(function() {
+				auto(input2, loc[2])
+			}, 600);
+			setTimeout(function() {
+				changeMarkerPosition(loc);
+			}, 800);
+		} else if ((input2.value != "" ) && (input1.value == "")) {
+
+			directionsDisplay.setMap(null);
+			var address2 = input2.value;
+			var loc = getlonglat(address2);
+			setTimeout(function() {
+				auto(input1, loc[2])
+			}, 600);
+			setTimeout(function() {
+				changeMarkerPosition(loc);
+			}, 800);
+		} else if ((input2.value == "" ) && (input1.value == "")) {
+			initGeolocation();
+		}
+
+	}
+
+	function changeMarkerPosition(loc) {
+
+		var latlng = new google.maps.LatLng(loc[0], loc[1]);
+		marker.setPosition(latlng);
+		map.setCenter(latlng);
+		hideInitializing();
+	}
+
+	function initGeolocation() {
+		showInitializing();
+		setTimeout(function() {
+			hideInitializing();
+		}, 8000);
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(success, fail);
+		} else {
+			errorDisplay("Sorry, your browser does not support geolocation services.");
+		}
+	}
+
+	function success(position) {
+
+		geocoder = new google.maps.Geocoder();
+		directionsDisplay = new google.maps.DirectionsRenderer();
+		coords = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		var myOptions = {
+			zoom : 12,
+			mapTypeId : google.maps.MapTypeId.ROADMAP,
+			center : coords
+		}
+
+		map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+		marker = new google.maps.Marker();
+		marker.setPosition(coords);
+		marker.setMap(map);
+		directionsDisplay.setMap(map);
+		hideInitializing();
+
+	}
+
+	function clearOverlays() {
+		for (var i = 0; i < markersArray.length; i++) {
+			markersArray[i].setMap(null);
+		}
+	}
+
+	function calcRoute(startloc, endloc) {
+		clearOverlays();
+		directionsDisplay.setMap(map);
+		var start = new google.maps.LatLng(startloc[0], startloc[1]);
+		var end = new google.maps.LatLng(endloc[0], endloc[1]);
+
+		start_coord.value = start;
+		end_coord.value = end;
+
+		var request = {
+			origin : start,
+			destination : end,
+			travelMode : google.maps.DirectionsTravelMode.DRIVING
+		};
+		directionsService.route(request, function(result, status) {
+			if (status == google.maps.DirectionsStatus.OK) {
+				// Display the distance:
+				$("#distance_km").val(result.routes[0].legs[0].distance.value / 1000);
+				// Display the duration:
+				$("#time_taken").val(result.routes[0].legs[0].duration.value);
+
+				directionsDisplay.setDirections(result);
+				
+					$("#save_route").fadeIn("fast");
+					$("#map_canvas").css("margin-bottom", "2px");				
+			} else {
+				errorDisplay("error:   " + status);
+
+			}
+			markersArray = [];
+			hideInitializing();
+		});
+
+	}
+
+	function getlonglat(address) {
+		var loc3 = []
+		geocoder.geocode({
+			'address' : address
+		}, function(results, status) {
+
+			if (status == google.maps.GeocoderStatus.OK) {
+				loc3[0] = results[0].geometry.location.lat();
+				loc3[1] = results[0].geometry.location.lng();
+
+				for (var i = 0; i < results[0].address_components.length; i++) {
+					for (var b = 0; b < results[0].address_components[i].types.length; b++) {
+
+						if (results[0].address_components[i].types[b] == "country") {
+							loc3[2] = results[0].address_components[i].short_name;
+							break;
+						}
+					}
+				}
+			} else {
+				errorDisplay("Either From: or To: field is empty or invalid");
+
+			}
+		});
+		return loc3;
+	}
+
+	function codeAddress() {
+		var address1 = input1.value;
+		var address2 = input2.value;
+		var loc1 = getlonglat(address1);
+		var loc2 = getlonglat(address2);
+		setTimeout(function() {
+			calcRoute(loc1, loc2);
+		}, 1500);
+
+	}
+
+	function fail() {
+		errorDisplay("An unknown error occurred.");
+	}
+
+	function auto(txt, countryy) {
+
+		if (countryy != "") {
+			var options = {
+				componentRestrictions : {
+					country : countryy
+				}
+			};
+		}
+		var autocomplete = new google.maps.places.Autocomplete(txt, options);
+		google.maps.event.addListener(autocomplete, 'place_changed', function() {
+			var place = autocomplete.getPlace();
+			if (txt.id == "from") {
+				place1 = place;
+			} else {
+				place2 = place;
+			}
+			console.log(place.address_components);
+		});
+	}
+
+	function callauto() {
+		auto(input1, country1);
+		auto(input2, country2);
+	}
+
+	function errorDisplay(message) {
+		hideInitializing();
+		err.innerHTML = message;
+		$("#error_view").slideDown("slow");
+		input1.value = "";
+		input2.value = "";
+		setTimeout(function() {
+			// err.innerHTML ="";
+			$("#error_view").slideUp("slow");
+		}, 4000);
+	}
+
+	function hideInitializing() {
+		$("#loading_map").hide();
+	}
+
+	function showInitializing() {
+		$("#loading_map").show();
+	}
+
+	function requestRoute() {
+		setTimeout(function() {
+			var first = $("#request_from").val();
+			var second = $("#request_to").val();
+			if ((first != "") && (second != "")) {
+				if ($("#request_car").val() == "car") {
+					document.getElementById('optionsCheckboxes_car').checked = true;
+				} else {
+					document.getElementById('optionsCheckboxes_notcar').checked = true;
+				}
+				callDialog(first, second);
+			}
+		}, 2500);
+
+	}
+
+
+	$(document).ready(function() {
+		requestRoute();
+	});
+	
+	 // function initialize(loc1,loc2) {      
+//       
+      // var mapOptions = { mapTypeId: google.maps.MapTypeId.ROADMAP, disableDefaultUI: true }
+//       
+      // map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+      // directionsDisplay.setMap(map);
+//       
+//       
+      // var start = loc1;
+      // var end = loc2;
+      // var request = {
+        // origin: start,
+        // destination: end,
+        // travelMode: google.maps.DirectionsTravelMode.DRIVING
+      // };
+      // directionsService.route(request, function(response, status) {
+        // if (status == google.maps.DirectionsStatus.OK) {
+        // directionsDisplay.setDirections(response);
+        // }
+      // });
+    // }
+
+</script>

@@ -44,20 +44,23 @@ class StaticPagesController < ApplicationController
   
   def details
     puts"---------------in details--------------------------#{params}"
-    params[:user_id]=current_user.identifier
+    params[:user_id]=current_user.identifier   
     params[:user_name]=current_user.profile.name
-    params[:date_at]=Time.zone.parse(params[:date_at]).utc    
+    params[:date_at]=Time.zone.parse(params[:date_at]).utc 
+    @no_of_requests=StaticPages.search_no_of_requests(params).results.length
+    puts "&&&&&&&&&&&&&&&&&&&&&&&&&&#{@no_of_requests}"    
+    unless @no_of_requests > ENV["MAX_REQUESTS"].to_i
+      puts "----------------------------000000000#{ENV["MAX_REQUESTS"]}"
     info=params.except(:controller, :action)
     puts"------------------------------$$$$$$$$$-----------#{info}"
-   
-   puts"(((((((((#{params[:date_at]})))))))))"
+    
     if StaticPages.create(info)
     puts "(((((((((((((((((((((((((((SAVED)))))))))))))))))))))))))))"
     else
     puts "(((((((((((((((((((ERROR)))))))))))))))))))"
     end
-    params[:search_futuretime]=params[:date_at]+4.hours
-    params[:search_pasttime]=params[:date_at]-1.hours
+    params[:search_futuretime]=params[:date_at]+ENV["TIME"].to_i.hours
+    params[:search_pasttime]=params[:date_at]-ENV["TIME"].to_i.hours
     lat_long1=params[:from_location].split(",");
     params[:from_lat]=lat_long1[0];
     params[:from_lon]=lat_long1[1];
@@ -69,6 +72,9 @@ class StaticPagesController < ApplicationController
     @near_loc=StaticPages.search(info2)
     puts "??????????????????????????????#{@near_loc.results}"
     render :partial=> "people"
+    else
+     render :text=> "No"
+    end
   end
   
   def main
@@ -81,17 +87,10 @@ class StaticPagesController < ApplicationController
   
   
   def search
-    puts "********************search$$$$$$$$$$#{params}"
-    if current_user.nil?  
+    puts "********************search$$$$$$$$$$#{params}"   
     info=params.except(:controller, :action);   
     puts "**********************#{info}" 
-    @near_loc=StaticPages.search_near(info)
-    else
-    params[:user_id]=current_user.identifier 
-    info=params.except(:controller, :action);
-    puts "**********************#{info}"
-    @near_loc=StaticPages.search_nearby(info)
-    end
+    @near_loc=StaticPages.search_near(info)   
     puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&#{@near_loc.results}"
     render :json => @near_loc
   end

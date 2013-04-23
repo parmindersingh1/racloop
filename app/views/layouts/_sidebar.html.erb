@@ -1,28 +1,35 @@
-<div id="loading_responses" class="loading">		
-    <img src="/assets/loading.gif" alt="loading" />
+<div id="loading_responses" class="loading">
+	<img src="/assets/loading.gif" alt="loading" />
 </div>
-<div class="well" >
+
+<div class="well" id="well_id">
 	<h5>My Requests</h5>
 	<%unless @requests.blank?%>
-	<%@requests.each do|request|%>
+	<input type="hidden" id="request_from" value="<%= @requests.results[0].from%>" />
+	<input type="hidden" id="request_to" value="<%= @requests.results[0].to%>" />
+	<input type="hidden" id="request_car" value="<%= @requests.results[0].have_car%>" />
+	<%@requests.results.each do|request|%>
 	<%if request.have_car=="true"%>
 	<div class="alert-message warning" id="response_div">
-		<a class="close" id="delete" value="<%=request.id%>" href="#">×</a>
-		<p id="p_request" value1="<%=request.from%>" value2="<%=request.to%>" value3="car">
-			I am <strong>driving</strong> from <strong><%=request.from%></strong> to <strong><%=request.to%></strong> at <strong><%=(Time.zone.parse(request.date_at).localtime).strftime("%m/%d/%y, %I:%M %p")%></strong>
+		<a class="close" id="delete" value="<%= request.id%>" href="#">×</a>
+		<p id="p_request" value1="<%= request.from%>" value2="<%= request.to%>" value3="car">
+			I am <strong>driving</strong> from <strong><%= request.from%></strong> to <strong><%= request.to%></strong> at <strong><%= (Time.zone.parse(request.date_at).localtime).strftime("%m/%d/%y, %I:%M %p")%></strong>
 		</p>
 	</div>
 	<%else%>
 	<div class="alert-message warning" id="response_div">
-		<a class="close" id ="delete" value= "<%=request.id%>" href="#">×</a>
-		<p id="p_request" value1="<%=request.from%>" value2="<%=request.to%>" value3="no car">
-			I need a <strong>drive</strong> from <strong><%=request.from%></strong> to <strong><%=request.to%></strong> at <strong><%=(Time.zone.parse(request.date_at).localtime).strftime("%m/%d/%y, %I:%M %p")%></strong>
+		<a class="close" id ="delete" value= "<%= request.id%>" href="#">×</a>
+		<p id="p_request" value1="<%= request.from%>" value2="<%= request.to%>" value3="no car">
+			I need a <strong>drive</strong> from <strong><%= request.from%></strong> to <strong><%= request.to%></strong> at <strong><%= (Time.zone.parse(request.date_at).localtime).strftime("%m/%d/%y, %I:%M %p")%></strong>
 		</p>
 	</div>
 	<%end%>
 	<%end%>
-<%else%>
-<h5>Sorry! No Records Found</h5>
-<%end%>
+	<%else%>
+	<input type="hidden" id="request_from" value="" />
+	<input type="hidden" id="request_to" value="" />
+	<input type="hidden" id="request_car" value="" />
+	<h5>Sorry! No Records Found</h5>
+	<%end%>
 
 </div>

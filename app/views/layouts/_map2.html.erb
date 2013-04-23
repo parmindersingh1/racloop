@@ -1,0 +1,152 @@
+<div id="error_div">
+	<center>
+		<h6 id="error_view" style="color:red"></h6>
+	</center>
+</div>
+<div id="map_canvas1"></div>
+
+<div id="loading_map" class="loading" style="left: 48%; top: 58%;">
+	<img src="/assets/loading.gif" alt="loading" />
+</div>
+
+<script>
+	var geocoder;
+	var directionDisplay;
+	var directionsService = new google.maps.DirectionsService();
+	var map;
+	var marker;
+	var start_coord = document.getElementById("from_coord");
+	var end_coord = document.getElementById("to_coord");
+	var err = document.getElementById("error_view");
+	var markersArray = [];
+
+	initGeolocation();
+
+	function initGeolocation() {
+		showInitializing();
+		setTimeout(function() {
+			hideInitializing();
+		}, 8000);
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(success, fail);
+		} else {
+			errorDisplay("Sorry, your browser does not support geolocation services.");
+		}
+	}
+
+	function success(position) {
+		geocoder = new google.maps.Geocoder();
+		directionsDisplay = new google.maps.DirectionsRenderer({
+			'draggable' : true
+		});
+		coords = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+		var myOptions = {
+			zoom : 12,
+			mapTypeId : google.maps.MapTypeId.ROADMAP,
+			center : coords
+		}
+		var lat_long = coords.toString();
+		lat_long = lat_long.replace(/[()]/g, '');
+		$("#current").val(lat_long);
+		var n = lat_long.split(",");
+		map = new google.maps.Map(document.getElementById("map_canvas1"), myOptions);
+		marker = new google.maps.Marker();
+		marker.setPosition(coords);
+		marker.setMap(map);
+		directionsDisplay.setMap(map);
+		$.get("/search", {
+			lat : n[0],
+			lon : n[1]
+		}, function(data) {
+			var response;
+			var result;
+			var n;
+			var date;
+			var show;
+			var range;
+			if (data.length > 15) {
+				range = 15;
+			} else {
+				range = data.length;
+			}
+			if (range == 0) {
+				hideInitializing();
+			}
+			for ( i = 0; i < range; i++) {
+				response = JSON.stringify(data[i]);
+				result = jQuery.parseJSON(response);
+				n = result.from_location.split(",");
+				date = new Date(result.date_at);
+				var hours = date.getHours();
+				var minutes = date.getMinutes();
+				var ampm = hours >= 12 ? 'pm' : 'am';
+				hours = hours % 12;
+				hours = hours ? hours : 12;
+				// the hour '0' should be '12'
+				minutes = minutes < 10 ? '0' + minutes : minutes;
+				show = "<center><b>" + result.user_name + "</b> is going <br>From: <b>" + result.from + "</b>  <br> To: <b>" + result.to + "</b><br> on <b>" + (date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + "</b> at <b> " + hours + ':' + minutes + ' ' + ampm) + "</b></center>";
+				addMarker(n[0], n[1], show);
+				hideInitializing();
+			}
+		});
+	}
+
+	function addMarker(lat, lng, data) {
+		var marker = new google.maps.Marker({
+			position : new google.maps.LatLng(lat, lng),
+			map : map,
+			icon : '/assets/car-rental-google-map-marker.png'
+		});
+		markersArray.push(marker);
+		var boxText = document.createElement("div");
+		boxText.style.cssText = "border: none; margin-top: 6px; background:#FFB894; color: black; padding: 5px;";
+		boxText.innerHTML = data;
+
+		var myOptions = {
+			content : boxText,
+			disableAutoPan : false,
+			maxWidth : 0,
+			pixelOffset : new google.maps.Size(-140, 0),
+			zIndex : null,
+			boxStyle : {
+				background : "url('/assets/tipbox.gif') no-repeat",
+				opacity : 0.90,
+				width : "280px"
+			}
+		};
+
+		var ib = new InfoBox();
+		google.maps.event.addListener(marker, "mouseover", function(e) {
+			ib.close();
+			ib.setOptions(myOptions)
+			ib.open(map, this);
+		});
+
+		google.maps.event.addListener(marker, "mouseout", function(e) {
+			ib.close();
+		});
+	}
+
+	function fail() {
+		errorDisplay("An unknown error occurred.");
+	}
+
+	function errorDisplay(message) {
+		hideInitializing();
+		err.innerHTML = message;
+		$("#error_view").slideDown("slow");
+		setTimeout(function() {
+			// err.innerHTML ="";
+			$("#error_view").slideUp("slow");
+		}, 4000);
+	}
+
+	function hideInitializing() {
+		$("#loading_map").hide();
+	}
+
+	function showInitializing() {
+		$("#loading_map").show();
+	}
+
+</script>

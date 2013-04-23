@@ -16,3 +16,6 @@ doc/
 .DS_Store
 .idea
 bundler_stubs/
+
+# Ignore application configuration
+/config/application.yml

@@ -13,20 +13,21 @@ class StaticPages
       property :date_at,      :type=> 'date' 
       property :have_car,     :type=> 'boolean'
       property :distance_time,:type=> 'string'
+      property :submit_time,  :type=> 'date', :default => Time.zone.now.utc
             
   def self.search(params)
     tire.search do
           puts"**********************#{params}"          
           query {all}             
-          filter :range, date_at: {gte: params[:date_at]}  
+          filter :range, date_at: {gte: Time.zone.now+1.hours }  
           filter :range, date_at: {lte: params[:search_futuretime]}
-          # filter :range, date_at: {gte: params[:search_pasttime]}
+          filter :range, date_at: {gte: params[:search_pasttime]}
           filter  :bool,:must_not=>{:term=>{ :user_id => params[:user_id]}}
-          filter('geo_distance', {:distance => '20km', 
+          filter('geo_distance', {:distance => ENV["DISTANCE"], 
         :from_location => {'lat' => params[:from_lat].to_f, 'lon' => params[:from_lon].to_f}}
               ) if params[:from_lat] && params[:from_lon]
               
-          filter('geo_distance', {:distance => '20km', 
+          filter('geo_distance', {:distance => ENV["DISTANCE"], 
         :to_location => {'lat' => params[:to_lat].to_f, 'lon' => params[:to_lon].to_f}}
               ) if params[:to_lat] && params[:to_lon]
                    
@@ -46,9 +47,9 @@ class StaticPages
      tire.search do
        puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%#{params[:lat]}%%%%%%%%%#{params[:lon]}"
        query {all}  
-       size 5 
+       size 15 
        filter  :bool,:must_not=>{:term=>{ :user_id => params[:user_id]}}
-       filter('geo_distance', {:distance => '10km', 
+       filter('geo_distance', {:distance => ENV["DISTANCE"], 
         :from_location => {'lat' => params[:lat].to_f, 'lon' => params[:lon].to_f}}
               ) if params[:lat] && params[:lon]
        filter :range, date_at: {gte: Time.zone.now}      
@@ -73,7 +74,7 @@ class StaticPages
          string "user_id:#{params[:user_id]}"
        end         
        filter :range, date_at: {gt: Time.zone.now}      
-       sort { by :date_at, "asc" }
+       sort { by :submit_time, "desc" }
      end     
    end  
    
@@ -81,14 +82,22 @@ class StaticPages
      tire.search do
        puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%#{params[:lat]}%%%%%%%%%#{params[:lon]}"
        query {all}  
-       size 5       
-       filter('geo_distance', {:distance => '10km', 
+       size 15       
+       filter('geo_distance', {:distance => ENV["DISTANCE"], 
         :from_location => {'lat' => params[:lat].to_f, 'lon' => params[:lon].to_f}}
               ) if params[:lat] && params[:lon]
        filter :range, date_at: {gte: Time.zone.now}      
        sort { by :date_at, "desc" }
      end
    end
+   
+   def self.search_no_of_requests(params)
+     tire.search do       
+       query do
+         string "user_id:#{params[:user_id]}"
+       end        
+     end     
+   end  
    
 end
 
