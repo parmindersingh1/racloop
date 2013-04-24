@@ -403,5 +403,4 @@ $(document).ready(function() {
 		$("#timepicker3").val((h - 12) + ":" + d1.getMinutes() + " " + "PM");
 	else
 		$("#timepicker3").val(d1.getHours() + ":" + d1.getMinutes() + " " + "AM");
-
 });

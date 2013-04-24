@@ -196,7 +196,13 @@
 		marker.setPosition(coords);
 		marker.setMap(map);
 		directionsDisplay.setMap(map);
-		hideInitializing();
+		if(attempt==0)
+		{
+		  google.maps.event.addListenerOnce(map, 'idle', function(){		      
+			requestRoute();
+	      });
+	     }
+	  	hideInitializing();
 
 	}
 
@@ -339,44 +345,14 @@
 				}
 				callDialog(first, second);
 			}
-		}, 2500);
-
+		}, 1000);
 	}
 
 
 	$(document).ready(function() {
-		requestRoute();
+		//requestRoute();
 	});
-
-	// function initialize(first, second) {
-		// showInitializing();
-		// setTimeout(function() {
-			// hideInitializing();
-		// }, 8000);
-// 
-		// var mapOptions = {
-			// mapTypeId : google.maps.MapTypeId.ROADMAP,
-			// disableDefaultUI : true
-		// }
-// 
-		// map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-		// directionsDisplay.setMap(map);
-// 
-		// var start = first;
-		// var end = second;
-		// var request = {
-			// origin : start,
-			// destination : end,
-			// travelMode : google.maps.DirectionsTravelMode.DRIVING
-		// };
-		// directionsService.route(request, function(response, status) {
-			// if (status == google.maps.DirectionsStatus.OK) {
-				// directionsDisplay.setDirections(response);
-				// hideInitializing();
-			// }
-		// });
-	// }
-
+	
 	function hideInitializing() {
 		$("#loading_map").hide();
 	}
