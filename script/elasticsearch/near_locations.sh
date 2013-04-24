@@ -1,131 +1,171 @@
 #!/bin/bash
 #Enter current lacations's latitude and longitude 
+area[0]="chandigarh,india"
+area[1]="Ambala City, Haryana"
+area[2]="Kurukshetra, Haryana"
+area[3]="Karnal, Haryana"
+area[4]="Panipat, Haryana"
+area[5]="Sonipat, Haryana"
+area[6]="Delhi, India"
+area[7]="Gurgaon, Haryana"
+echo "\"${area[0]}\""
 
-lat=30.7353
-long=76.7911
+lat[0]=30.7353
+long[0]=76.7911
+
+lat[1]=30.3800
+long[1]=76.7800
+
+lat[2]=30.0000
+long[2]=76.7500
+
+lat[3]=29.6800
+long[3]=76.9800
+
+lat[4]=29.3900
+long[4]=76.9700
+
+lat[5]=28.9800
+long[5]=77.0200
+
+lat[6]=29.0167
+long[6]=77.3833
+
+lat[7]=28.4700
+long[7]=77.0300
 
 #Enter Future time to display in people near or past time to display in history
-
-dt="2013-04-30"
-tm="04:30:00"
-
-dtm=\"$dt"T"$tm\"
-
-  c=$lat
-  d=$long
-
-
-echo $c
-for i in {1..2}
+inc=2
+for i in {0..6}
 do
-c=$(echo "$c + 0.02" | bc -l)
-d=$(echo "$d + 0.02" | bc -l)
-e="\"$c,$d\""
-echo $c
+
+for j in {1..7}
+do
+echo "---------$inc"
+
+echo "-----------$i"
+
+echo "-----------$j"
+num=$(($inc+$i + $j))
+
+echo "-----------$num"
+a=$(date -u +"%Y-%m-%dT%H:%M:%S" --date="$num hour")
+
+if [[ $i -ge $j ]]
+then
+echo "                  "
+continue
+else
+dtm=\"$dt"T"$tm\"
+  from="\"${lat[$i]},${long[$i]}\""
+  to="\"${lat[$j]},${long[$j]}\""
+echo $from
+echo $to
+for k in {1..1}
+do
+
 curl -XPOST 'http://localhost:9200/static_pages/static_pages/' -d '
 {
     "user_name": "Rajan Punchouty",
     "user_id": "100005196784043",
-    "from": "Panchkula, Haryana, India" ,
-    "from_location": '$e',
-    "to":"Delhi, India",
-    "to_location":"28.635308, 77.22496000000001",
-    "date_at":'$dtm',
+    "from": '"\"${area[$i]}\""',
+    "from_location": '$from',
+    "to": '"\"${area[$j]}\""',
+    "to_location": '$to',
+    "date_at":'"\"$a\""',
     "have_car":"false",
     "distance_time":"255.109,245"
 }'
 
 done
 
- c=$lat
- d=$long
 
-for i in {1..2}
+for k in {1..1}
 do
-c=$(echo "$c - 0.02" | bc -l)
-d=$(echo "$d - 0.02" | bc -l)
-e="\"$c,$d\""
 
 curl -XPOST 'http://localhost:9200/static_pages/static_pages/' -d '
 {
     "user_name": "Pardeep Saini",
     "user_id": "100000455972792",
-    "from": "Mohali, Punjab, India" ,
-    "from_location": '$e',
-    "to":"Delhi, India",
-    "to_location":"28.635308, 77.22496000000001",
-    "date_at":'$dtm',
+    "from": '"\"${area[$i]}\""',
+    "from_location": '$from',
+    "to": '"\"${area[$j]}\""',
+    "to_location": '$to',
+    "date_at":'"\"$a\""',
     "have_car":"true",
     "distance_time":"260.181,251"
 }'
 
 done
 
- c=$lat
- d=$long
-
-for i in {1..2}
+for k in {1..1}
 do
-c=$(echo "$c + 0.008" | bc -l)
-d=$(echo "$d - 0.003" | bc -l)
-e="\"$c,$d\""
+
 curl -XPOST 'http://localhost:9200/static_pages/static_pages/' -d '
 {
     "user_name": "Anu Sharma",
     "user_id": "100002283355067",
-    "from": "Sector 22, Chandigarh, India" ,
-    "from_location": '$e',
-    "to":"Akshardham, Noida Link Road, Ganesh Nagar, Patparganj, Delhi, India",
-    "to_location":"28.617988, 77.27937199999997",
-    "date_at":'$dtm',
+    "from": '"\"${area[$i]}\""',
+    "from_location": '$from',
+    "to": '"\"${area[$j]}\""',
+    "to_location": '$to',
+    "date_at":'"\"$a\""',
     "have_car":"false",
     "distance_time":"258.61,246"
 }'
 done
 
-
- c=$lat
- d=$long
-
-for i in {1..2}
+ 
+for k in {1..1}
 do
-c=$(echo "$c - 0.011" | bc -l)
-d=$(echo "$d - 0.001" | bc -l)
-e="\"$c,$d\""
+
 curl -XPOST 'http://localhost:9200/static_pages/static_pages/' -d '
 {
     "user_name": "Kamal Preet Kaur",
     "user_id": "100001279621894",
-    "from": "Sector 17, Chandigarh, India" ,
-    "from_location": '$e',
-    "to":"Tamil Nadu, India",
-    "to_location":"11.1271225, 78.65689420000001",
-    "date_at":'$dtm',
+    "from": '"\"${area[$i]}\""',
+    "from_location": '$from',
+    "to": '"\"${area[$j]}\""',
+    "to_location": '$to',
+    "date_at":'"\"$a\""',
     "have_car":"true",
     "distance_time":"2687.182,2419"
 }'
 done
 
- c=$lat
- d=$long
 
-for i in {1..2}
+for k in {1..1}
 do
-c=$(echo "$c - 0.02" | bc -l)
-d=$(echo "$d + 0.005" | bc -l)
-e="\"$c,$d\""
 curl -XPOST 'http://localhost:9200/static_pages/static_pages/' -d '
 {
     "user_name": "Parminder Singh",
     "user_id": "100005735493567",
-    "from": "Sector 26, Chandigarh, India" ,
-    "from_location": '$e',
-    "to":"Delhi Cantonment, New Delhi, Delhi, India",
-    "to_location":"28.586738, 77.13199889999999",
-    "date_at":'$dtm',
+    "from": '"\"${area[$i]}\""',
+    "from_location": '$from',
+    "to": '"\"${area[$j]}\""',
+    "to_location": '$to',
+    "date_at":'"\"$a\""',
     "have_car":"false",
     "distance_time":"257.533,253"
 }'
 done
 
+for k in {1..1}
+do
+curl -XPOST 'http://localhost:9200/static_pages/static_pages/' -d '
+{
+    "user_name": "test user",
+    "user_id": "100005714525327",
+    "from": '"\"${area[$i]}\""',
+    "from_location": '$from',
+    "to": '"\"${area[$j]}\""',
+    "to_location": '$to',
+    "date_at":'"\"$a\""',
+    "have_car":"false",
+    "distance_time":"257.533,253"
+}'
+done
 
+fi
+done
+done

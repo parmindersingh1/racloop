@@ -11,7 +11,7 @@ curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
     "user_id": "100000455972792",
     "user_name": "Pardeep Saini",
     
-    "email": "pardeep@ezzie.in"
+    "email": "saini.pardeep87@gmail.com"
 }'
 
 curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
@@ -28,7 +28,7 @@ curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
     "user_id": "100001279621894",
     "user_name": "Kamal Preet Kaur",
    
-    "email": "kamalpreet@ezzie.in"
+    "email": "kkaur971@gmail.com"
 }'
 
 
@@ -38,6 +38,14 @@ curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
     "user_name": "Parminder Singh",
    
     "email": "parminder@ezzie.in"
+}'
+
+curl -XPOST 'http://localhost:9200/user_informations/user_information/' -d '
+{
+    "user_id": "100005714525327",
+    "user_name": "test user",
+   
+    "email": "kamalpreet@ezzie.in"
 }'
 
 

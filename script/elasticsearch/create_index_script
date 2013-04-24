@@ -32,6 +32,9 @@ curl -XPUT 'http://localhost:9200/static_pages/static_pages/_mapping' -d '
         },
         "distance_time": {
           "type": "string"
+        },
+         "submit_time": {
+           "type": "date"
         }
       }
     }
