@@ -23,11 +23,11 @@ class StaticPages
           filter :range, date_at: {lte: params[:search_futuretime]}
           filter :range, date_at: {gte: params[:search_pasttime]}
           filter  :bool,:must_not=>{:term=>{ :user_id => params[:user_id]}}
-          filter('geo_distance', {:distance => ENV["DISTANCE"], 
+          filter('geo_distance', {:distance =>  params[:distance], 
         :from_location => {'lat' => params[:from_lat].to_f, 'lon' => params[:from_lon].to_f}}
               ) if params[:from_lat] && params[:from_lon]
               
-          filter('geo_distance', {:distance => ENV["DISTANCE"], 
+          filter('geo_distance', {:distance => "20km", 
         :to_location => {'lat' => params[:to_lat].to_f, 'lon' => params[:to_lon].to_f}}
               ) if params[:to_lat] && params[:to_lon]
                    
@@ -49,7 +49,7 @@ class StaticPages
        query {all}  
        size 15 
        filter  :bool,:must_not=>{:term=>{ :user_id => params[:user_id]}}
-       filter('geo_distance', {:distance => ENV["DISTANCE"], 
+       filter('geo_distance', {:distance => "20km", 
         :from_location => {'lat' => params[:lat].to_f, 'lon' => params[:lon].to_f}}
               ) if params[:lat] && params[:lon]
        filter :range, date_at: {gte: Time.zone.now}      
@@ -83,7 +83,7 @@ class StaticPages
        puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%#{params[:lat]}%%%%%%%%%#{params[:lon]}"
        query {all}  
        size 15       
-       filter('geo_distance', {:distance => ENV["DISTANCE"], 
+       filter('geo_distance', {:distance => "20km", 
         :from_location => {'lat' => params[:lat].to_f, 'lon' => params[:lon].to_f}}
               ) if params[:lat] && params[:lon]
        filter :range, date_at: {gte: Time.zone.now}      

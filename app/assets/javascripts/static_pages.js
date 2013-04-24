@@ -58,7 +58,9 @@ $(document).on("click", "#People_near", function(event) {
 	$(".tab-content").empty();
 	$(".tab-content").html(people);
 });
-$(document).on("click", "#history", function(event) {
+
+function history_click()
+{
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
@@ -70,6 +72,10 @@ $(document).on("click", "#history", function(event) {
 		$(".tab-content").empty();
 		$(".tab-content").html(data);
 	});
+}
+
+$(document).on("click", "#history", function(event) {
+	history_click();
 });
 
 $(document).on("click", "#savelist", function(event) {
@@ -141,7 +147,7 @@ $(document).on("submit", ".form-stacked", function(event) {
 	var minutes = $("#time_taken").val() / (60);
 	var obj = Number(minutes).toFixed(0);
 	var distance_time = $("#distance_km").val() + "," + obj;
-
+    var distance=$("#distance_km").val();
 	if ((from == null || from == "") || (to == null || to == "")) {
 		alert_dialog("please enter locations");
 		return false;
@@ -167,12 +173,15 @@ $(document).on("submit", ".form-stacked", function(event) {
 			to_location : to_location,
 			distance_time : distance_time,
 			date_at : new Date(datetime),
-			have_car : have_car
+			have_car : have_car,
+			distance : distance
 		}, function(data) {
 			hideLoading();
 			if(data!="No")
 		 {
 			inform_dialog("Saved.. the estimated time of journey is: " + obj + " Mins");
+			$("li").removeClass("active");
+	        $("#People_near").parent().addClass("active");
 			$(".tab-content").empty();
 			$(".tab-content").html(data);
 			people = $(".tab-content").html();
@@ -253,6 +262,39 @@ $(document).on("click", "#delete", function() {
 					}, function(data) {
 					});
 					$("#reset_btn").click();
+				}
+			},
+			'No' : {
+				'class' : 'gray',
+				'action' : function() {
+				}	// Nothing to do in this case. You can as well omit the action property.
+			}
+		}
+	});
+
+});
+
+
+$(document).on("click", "#delete_history", function() {
+	$.confirm({
+		'title' : 'Delete Confirmation',
+		'message' : 'You are about to delete this item. <br />It cannot be restored at a later time! Continue?',
+		'buttons' : {
+			'Yes' : {
+				'class' : 'blue',
+								'action' : function() {
+					var id = $("#delete_history").attr("value");
+					$.get("/destroy", {
+						id : id
+					}, function(data) {
+						showLoading();
+	                    setTimeout(function() {
+		                hideLoading();
+                     	}, 8000);
+						setTimeout(function() {
+				         history_click();
+			             }, 1500);
+					});					
 				}
 			},
 			'No' : {
@@ -351,26 +393,6 @@ $(document).on("click", "#save_button", function() {
 
 });
 
-// $('.datepicker').each(function() {
-	// var minDate = new Date();
-	// minDate.setHours(0);
-	// minDate.setMinutes(0);
-	// minDate.setSeconds(0, 0);
-// 
-	// var $picker = $(this);
-	// $picker.datepicker();
-// 
-	// var pickerObject = $picker.data('datepicker');
-// 
-	// $picker.on('changeDate', function(ev) {
-		// if (ev.date.valueOf() < minDate.valueOf()) {
-			// alert('Nope');
-			// pickerObject.setValue(minDate);
-			// ev.preventDefault();
-			// return false;
-		// }
-	// });
-// });
 
 $(document).ready(function() {
 	var d1;

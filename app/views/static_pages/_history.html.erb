@@ -11,6 +11,7 @@
 								<th>From</th>
 								<th>To</th>
 								<th>@</th>
+								<th>Delete<th>
 							</tr>
 						</thead>
 						<tbody>
@@ -20,7 +21,8 @@
 							   	<td><%=hist.user_name%></td>
 								<td><%=hist.from%></td>
 								<td><%=hist.to%></td>								
-								<td><%=(Time.zone.parse(hist.date_at).localtime).strftime("%m/%d/%y, %I:%M %p")%></td>												
+								<td><%=(Time.zone.parse(hist.date_at).localtime).strftime("%m/%d/%y, %I:%M %p")%></td>
+								<td><a class="close" id ="delete_history" value= "<%= hist.id%>" href="#">×</a></td>												
 					    </tr>
 						  <%end%>
 											

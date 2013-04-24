@@ -47,11 +47,13 @@ class StaticPagesController < ApplicationController
     params[:user_id]=current_user.identifier   
     params[:user_name]=current_user.profile.name
     params[:date_at]=Time.zone.parse(params[:date_at]).utc 
+    distance=((params[:distance].to_i*ENV["DISTANCE"].to_i)/100).to_s+"km"
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#{distance}"
     @no_of_requests=StaticPages.search_no_of_requests(params).results.length
     puts "&&&&&&&&&&&&&&&&&&&&&&&&&&#{@no_of_requests}"    
-    unless @no_of_requests > ENV["MAX_REQUESTS"].to_i
+    unless @no_of_requests >= ENV["MAX_REQUESTS"].to_i
       puts "----------------------------000000000#{ENV["MAX_REQUESTS"]}"
-    info=params.except(:controller, :action)
+    info=params.except(:controller, :action, :distance)
     puts"------------------------------$$$$$$$$$-----------#{info}"
     
     if StaticPages.create(info)
@@ -59,6 +61,7 @@ class StaticPagesController < ApplicationController
     else
     puts "(((((((((((((((((((ERROR)))))))))))))))))))"
     end
+    params[:distance]=distance
     params[:search_futuretime]=params[:date_at]+ENV["TIME"].to_i.hours
     params[:search_pasttime]=params[:date_at]-ENV["TIME"].to_i.hours
     lat_long1=params[:from_location].split(",");

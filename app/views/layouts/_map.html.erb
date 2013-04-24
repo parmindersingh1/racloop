@@ -38,12 +38,13 @@
 	initGeolocation();
 	callauto();
 
-	$(document).on("click", "#table_history tbody tr", function() {
-		var first = $(this).find("td").slice(1, 2).text();
-		var second = $(this).find("td").slice(2, 3).text();
+	$(document).on("click", "#table_history tr td:not(:last-child)", function() {		
+		var first = $(this).parent("tr").find("td").slice(1, 2).text();
+		var second = $(this).parent("tr").find("td").slice(2, 3).text();
 		callDialog(first, second);
 	});
 
+   
 	function callDialog(first, second) {
 		input1.value = first;
 		input2.value = second;
@@ -227,9 +228,15 @@
 				$("#time_taken").val(result.routes[0].legs[0].duration.value);
 
 				directionsDisplay.setDirections(result);
-
-				$("#save_route").fadeIn("fast");
-				$("#map_canvas").css("margin-bottom", "2px");
+                if(attempt != 0)
+                {
+				 $("#save_route").fadeIn("fast");
+				 $("#map_canvas").css("margin-bottom", "2px");
+				}
+				else
+				{
+					attempt = 1;
+				}
 			} else {
 				errorDisplay("error:   " + status);
 
@@ -324,17 +331,15 @@
 		setTimeout(function() {
 			var first = $("#request_from").val();
 			var second = $("#request_to").val();
-			if ((first != "") && (second != "")) {
-				input1.value = first;
-				input2.value = second;
+			if ((first != "") && (second != "")) {				
 				if ($("#request_car").val() == "car") {
 					document.getElementById('optionsCheckboxes_car').checked = true;
 				} else {
 					document.getElementById('optionsCheckboxes_notcar').checked = true;
 				}
-				initialize(first, second);
+				callDialog(first, second);
 			}
-		}, 1000);
+		}, 2500);
 
 	}
 
@@ -343,34 +348,34 @@
 		requestRoute();
 	});
 
-	function initialize(first, second) {
-		showInitializing();
-		setTimeout(function() {
-			hideInitializing();
-		}, 8000);
-
-		var mapOptions = {
-			mapTypeId : google.maps.MapTypeId.ROADMAP,
-			disableDefaultUI : true
-		}
-
-		map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-		directionsDisplay.setMap(map);
-
-		var start = first;
-		var end = second;
-		var request = {
-			origin : start,
-			destination : end,
-			travelMode : google.maps.DirectionsTravelMode.DRIVING
-		};
-		directionsService.route(request, function(response, status) {
-			if (status == google.maps.DirectionsStatus.OK) {
-				directionsDisplay.setDirections(response);
-				hideInitializing();
-			}
-		});
-	}
+	// function initialize(first, second) {
+		// showInitializing();
+		// setTimeout(function() {
+			// hideInitializing();
+		// }, 8000);
+// 
+		// var mapOptions = {
+			// mapTypeId : google.maps.MapTypeId.ROADMAP,
+			// disableDefaultUI : true
+		// }
+// 
+		// map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+		// directionsDisplay.setMap(map);
+// 
+		// var start = first;
+		// var end = second;
+		// var request = {
+			// origin : start,
+			// destination : end,
+			// travelMode : google.maps.DirectionsTravelMode.DRIVING
+		// };
+		// directionsService.route(request, function(response, status) {
+			// if (status == google.maps.DirectionsStatus.OK) {
+				// directionsDisplay.setDirections(response);
+				// hideInitializing();
+			// }
+		// });
+	// }
 
 	function hideInitializing() {
 		$("#loading_map").hide();
