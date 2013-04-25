@@ -59,8 +59,7 @@ $(document).on("click", "#People_near", function(event) {
 	$(".tab-content").html(people);
 });
 
-function history_click()
-{
+function history_click() {
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
@@ -73,6 +72,7 @@ function history_click()
 		$(".tab-content").html(data);
 	});
 }
+
 
 $(document).on("click", "#history", function(event) {
 	history_click();
@@ -147,7 +147,7 @@ $(document).on("submit", ".form-stacked", function(event) {
 	var minutes = $("#time_taken").val() / (60);
 	var obj = Number(minutes).toFixed(0);
 	var distance_time = $("#distance_km").val() + "," + obj;
-    var distance=$("#distance_km").val();
+	var distance = $("#distance_km").val();
 	if ((from == null || from == "") || (to == null || to == "")) {
 		alert_dialog("please enter locations");
 		return false;
@@ -177,23 +177,20 @@ $(document).on("submit", ".form-stacked", function(event) {
 			distance : distance
 		}, function(data) {
 			hideLoading();
-			if(data!="No")
-		 {
-			inform_dialog("Saved.. the estimated time of journey is: " + obj + " Mins");
-			$("li").removeClass("active");
-	        $("#People_near").parent().addClass("active");
-			$(".tab-content").empty();
-			$(".tab-content").html(data);
-			people = $(".tab-content").html();
-			setTimeout(function() {
-				callrequest();
-			}, 1500);
-         }
-         else
-         {
-         	alert_dialog("sorry you already has maximum requests delete previous to proceed!!");
-         }
-           
+			if (data != "No") {
+				inform_dialog("Saved.. the estimated time of journey is: " + obj + " Mins");
+				$("li").removeClass("active");
+				$("#People_near").parent().addClass("active");
+				$(".tab-content").empty();
+				$(".tab-content").html(data);
+				people = $(".tab-content").html();
+				setTimeout(function() {
+					callrequest();
+				}, 1500);
+			} else {
+				alert_dialog("sorry you already has maximum requests delete previous to proceed!!");
+			}
+
 		});
 
 	}
@@ -274,7 +271,6 @@ $(document).on("click", "#delete", function() {
 
 });
 
-
 $(document).on("click", "#delete_history", function() {
 	$.confirm({
 		'title' : 'Delete Confirmation',
@@ -282,19 +278,19 @@ $(document).on("click", "#delete_history", function() {
 		'buttons' : {
 			'Yes' : {
 				'class' : 'blue',
-								'action' : function() {
+				'action' : function() {
 					var id = $("#delete_history").attr("value");
 					$.get("/destroy", {
 						id : id
 					}, function(data) {
 						showLoading();
-	                    setTimeout(function() {
-		                hideLoading();
-                     	}, 8000);
 						setTimeout(function() {
-				         history_click();
-			             }, 1500);
-					});					
+							hideLoading();
+						}, 8000);
+						setTimeout(function() {
+							history_click();
+						}, 1500);
+					});
 				}
 			},
 			'No' : {
@@ -393,14 +389,30 @@ $(document).on("click", "#save_button", function() {
 
 });
 
-
 $(document).ready(function() {
-	var d1;
-	d1 = new Date();
-	var h;
-	h = (d1.getHours() + 1);
-	if (h > 12)
-		$("#timepicker3").val((h - 12) + ":" + d1.getMinutes() + " " + "PM");
-	else
-		$("#timepicker3").val(d1.getHours() + ":" + d1.getMinutes() + " " + "AM");
+	var a_p = "";
+	var d = new Date();
+	var curr_hour = (d.getHours() + 1);
+	if (curr_hour < 12) {
+		a_p = "AM";
+	} else {
+		a_p = "PM";
+	}
+	if (curr_hour == 0) {
+		curr_hour = 12;
+	}
+	if (curr_hour > 12) {
+		curr_hour = curr_hour - 12;
+	}
+
+	var curr_min = d.getMinutes();
+
+	curr_min = curr_min + "";
+
+	if (curr_min.length == 1) {
+		curr_min = "0" + curr_min;
+	}
+
+	$("#timepicker3").val((curr_hour < 10 ? '0' + curr_hour : curr_hour) + ":" + curr_min + " " + a_p);
+
 });

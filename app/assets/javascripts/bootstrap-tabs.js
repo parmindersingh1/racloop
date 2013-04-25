@@ -15,66 +15,51 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ======================================================== */
+ * ======================================================== */! function($) {"use strict"
 
+	function activate(element, container) {
+		container.find('> .active').removeClass('active').find('> .dropdown-menu > .active').removeClass('active')
 
-!function( $ ){
+		element.addClass('active')
 
-  "use strict"
+		if (element.parent('.dropdown-menu')) {
+			element.closest('li.dropdown').addClass('active')
+		}
+	}
 
-  function activate ( element, container ) {
-    container
-      .find('> .active')
-      .removeClass('active')
-      .find('> .dropdown-menu > .active')
-      .removeClass('active')
+	function tab(e) {
+		var $this = $(this), $ul = $this.closest('ul:not(.dropdown-menu)'), href = $this.attr('href'), previous, $href
 
-    element.addClass('active')
+		if (/^#\w+/.test(href)) {
+			e.preventDefault()
 
-    if ( element.parent('.dropdown-menu') ) {
-      element.closest('li.dropdown').addClass('active')
-    }
-  }
+			if ($this.parent('li').hasClass('active')) {
+				return
+			}
 
-  function tab( e ) {
-    var $this = $(this)
-      , $ul = $this.closest('ul:not(.dropdown-menu)')
-      , href = $this.attr('href')
-      , previous
-      , $href
+			previous = $ul.find('.active a').last()[0]
+			$href = $(href)
 
-    if ( /^#\w+/.test(href) ) {
-      e.preventDefault()
+			activate($this.parent('li'), $ul)
+			activate($href, $href.parent())
 
-      if ( $this.parent('li').hasClass('active') ) {
-        return
-      }
+			$this.trigger({
+				type : 'change',
+				relatedTarget : previous
+			})
+		}
+	}
 
-      previous = $ul.find('.active a').last()[0]
-      $href = $(href)
+	/* TABS/PILLS PLUGIN DEFINITION
+	 * ============================ */
 
-      activate($this.parent('li'), $ul)
-      activate($href, $href.parent())
+	$.fn.tabs = $.fn.pills = function(selector) {
+		return this.each(function() {
+			$(this).delegate(selector || '.tabs li > a, .pills > li > a', 'click', tab)
+		})
+	}
 
-      $this.trigger({
-        type: 'change'
-      , relatedTarget: previous
-      })
-    }
-  }
-
-
- /* TABS/PILLS PLUGIN DEFINITION
-  * ============================ */
-
-  $.fn.tabs = $.fn.pills = function ( selector ) {
-    return this.each(function () {
-      $(this).delegate(selector || '.tabs li > a, .pills > li > a', 'click', tab)
-    })
-  }
-
-  $(document).ready(function () {
-    $('body').tabs('ul[data-tabs] li > a, ul[data-pills] > li > a')
-  })
-
-}( window.jQuery || window.ender );
+	$(document).ready(function() {
+		$('body').tabs('ul[data-tabs] li > a, ul[data-pills] > li > a')
+	})
+}(window.jQuery || window.ender);

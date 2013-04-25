@@ -15,50 +15,42 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ============================================================ */
+ * ============================================================ */! function($) {"use strict"
 
-!function( $ ){
+	function setState(el, state) {
+		var d = 'disabled', $el = $(el), data = $el.data()
 
-  "use strict"
+		state = state + 'Text'
+		data.resetText || $el.data('resetText', $el.html())
 
-  function setState(el, state) {
-    var d = 'disabled'
-      , $el = $(el)
-      , data = $el.data()
+		$el.html(data[state] || $.fn.button.defaults[state])
 
-    state = state + 'Text'
-    data.resetText || $el.data('resetText', $el.html())
+		setTimeout(function() {
+			state == 'loadingText' ? $el.addClass(d).attr(d, d) : $el.removeClass(d).removeAttr(d)
+		}, 0)
+	}
 
-    $el.html( data[state] || $.fn.button.defaults[state] )
+	function toggle(el) {
+		$(el).toggleClass('active')
+	}
 
-    setTimeout(function () {
-      state == 'loadingText' ?
-        $el.addClass(d).attr(d, d) :
-        $el.removeClass(d).removeAttr(d)
-    }, 0)
-  }
 
-  function toggle(el) {
-    $(el).toggleClass('active')
-  }
+	$.fn.button = function(options) {
+		return this.each(function() {
+			if (options == 'toggle') {
+				return toggle(this)
+			}
+			options && setState(this, options)
+		})
+	}
 
-  $.fn.button = function(options) {
-    return this.each(function () {
-      if (options == 'toggle') {
-        return toggle(this)
-      }
-      options && setState(this, options)
-    })
-  }
+	$.fn.button.defaults = {
+		loadingText : 'loading...'
+	}
 
-  $.fn.button.defaults = {
-    loadingText: 'loading...'
-  }
-
-  $(function () {
-    $('body').delegate('.btn[data-toggle]', 'click', function () {
-      $(this).button('toggle')
-    })
-  })
-
-}( window.jQuery || window.ender );
+	$(function() {
+		$('body').delegate('.btn[data-toggle]', 'click', function() {
+			$(this).button('toggle')
+		})
+	})
+}(window.jQuery || window.ender); 

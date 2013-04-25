@@ -15,110 +15,96 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ========================================================== */
+ * ========================================================== */! function($) {"use strict"
+
+	/* CSS TRANSITION SUPPORT (https://gist.github.com/373874)
+	 * ======================================================= */
+
+	var transitionEnd
+
+	$(document).ready(function() {
+
+		$.support.transition = (function() {
+			var thisBody = document.body || document.documentElement, thisStyle = thisBody.style, support = thisStyle.transition !== undefined || thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.MsTransition !== undefined || thisStyle.OTransition !== undefined
+			return support
+		})()
+
+		// set CSS transition event type
+		if ($.support.transition) {
+			transitionEnd = "TransitionEnd"
+			if ($.browser.webkit) {
+				transitionEnd = "webkitTransitionEnd"
+			} else if ($.browser.mozilla) {
+				transitionEnd = "transitionend"
+			} else if ($.browser.opera) {
+				transitionEnd = "oTransitionEnd"
+			}
+		}
+
+	})
+	/* ALERT CLASS DEFINITION
+	 * ====================== */
+
+	var Alert = function(content, options) {
+		if (options == 'close')
+			return this.close.call(content)
+		this.settings = $.extend({}, $.fn.alert.defaults, options)
+		this.$element = $(content).delegate(this.settings.selector, 'click', this.close)
+	}
+
+	Alert.prototype = {
+
+		close : function(e) {
+			var $element = $(this), className = 'alert-message'
+
+			$element = $element.hasClass(className) ? $element : $element.parent()
+
+			e && e.preventDefault()
+			$element.removeClass('in')
+
+			function removeElement() {
+				$element.remove()
+			}
 
 
-!function( $ ){
+			$.support.transition && $element.hasClass('fade') ? $element.bind(transitionEnd, removeElement) : removeElement()
+		}
+	}
 
-  "use strict"
+	/* ALERT PLUGIN DEFINITION
+	 * ======================= */
 
-  /* CSS TRANSITION SUPPORT (https://gist.github.com/373874)
-   * ======================================================= */
+	$.fn.alert = function(options) {
 
-   var transitionEnd
+		if (options === true) {
+			return this.data('alert')
+		}
 
-   $(document).ready(function () {
+		return this.each(function() {
+			var $this = $(this), data
 
-     $.support.transition = (function () {
-       var thisBody = document.body || document.documentElement
-         , thisStyle = thisBody.style
-         , support = thisStyle.transition !== undefined || thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.MsTransition !== undefined || thisStyle.OTransition !== undefined
-       return support
-     })()
+			if ( typeof options == 'string') {
 
-     // set CSS transition event type
-     if ( $.support.transition ) {
-       transitionEnd = "TransitionEnd"
-       if ( $.browser.webkit ) {
-        transitionEnd = "webkitTransitionEnd"
-       } else if ( $.browser.mozilla ) {
-        transitionEnd = "transitionend"
-       } else if ( $.browser.opera ) {
-        transitionEnd = "oTransitionEnd"
-       }
-     }
+				data = $this.data('alert')
 
-   })
+				if ( typeof data == 'object') {
+					return data[options].call($this)
+				}
 
- /* ALERT CLASS DEFINITION
-  * ====================== */
+			}
 
-  var Alert = function ( content, options ) {
-    if (options == 'close') return this.close.call(content)
-    this.settings = $.extend({}, $.fn.alert.defaults, options)
-    this.$element = $(content)
-      .delegate(this.settings.selector, 'click', this.close)
-  }
+			$(this).data('alert', new Alert(this, options))
 
-  Alert.prototype = {
+		})
+	}
 
-    close: function (e) {
-      var $element = $(this)
-        , className = 'alert-message'
+	$.fn.alert.defaults = {
+		selector : '.close'
+	}
 
-      $element = $element.hasClass(className) ? $element : $element.parent()
-
-      e && e.preventDefault()
-      $element.removeClass('in')
-
-      function removeElement () {
-        $element.remove()
-      }
-
-      $.support.transition && $element.hasClass('fade') ?
-        $element.bind(transitionEnd, removeElement) :
-        removeElement()
-    }
-
-  }
-
-
- /* ALERT PLUGIN DEFINITION
-  * ======================= */
-
-  $.fn.alert = function ( options ) {
-
-    if ( options === true ) {
-      return this.data('alert')
-    }
-
-    return this.each(function () {
-      var $this = $(this)
-        , data
-
-      if ( typeof options == 'string' ) {
-
-        data = $this.data('alert')
-
-        if (typeof data == 'object') {
-          return data[options].call( $this )
-        }
-
-      }
-
-      $(this).data('alert', new Alert( this, options ))
-
-    })
-  }
-
-  $.fn.alert.defaults = {
-    selector: '.close'
-  }
-
-  $(document).ready(function () {
-    new Alert($('body'), {
-      selector: '.alert-message[data-alert] .close'
-    })
-  })
-
-}( window.jQuery || window.ender );
+	$(document).ready(function() {
+		new Alert($('body'), {
+			selector : '.alert-message[data-alert] .close'
+		})
+	})
+}(window.jQuery || window.ender); 

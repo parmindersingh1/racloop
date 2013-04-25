@@ -15,93 +15,73 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ============================================================== */
+ * ============================================================== */! function($) {"use strict"
+
+	var $window = $(window)
+
+	function ScrollSpy(topbar, selector) {
+		var processScroll = $.proxy(this.processScroll, this)
+		this.$topbar = $(topbar)
+		this.selector = selector || 'li > a'
+		this.refresh()
+		this.$topbar.delegate(this.selector, 'click', processScroll)
+		$window.scroll(processScroll)
+		this.processScroll()
+	}
 
 
-!function ( $ ) {
+	ScrollSpy.prototype = {
 
-  "use strict"
+		refresh : function() {
+			this.targets = this.$topbar.find(this.selector).map(function() {
+				var href = $(this).attr('href')
+				return /^#\w/.test(href) && $(href).length ? href : null
+			})
 
-  var $window = $(window)
+			this.offsets = $.map(this.targets, function(id) {
+				return $(id).offset().top
+			})
+		},
+		processScroll : function() {
+			var scrollTop = $window.scrollTop() + 10, offsets = this.offsets, targets = this.targets, activeTarget = this.activeTarget, i
 
-  function ScrollSpy( topbar, selector ) {
-    var processScroll = $.proxy(this.processScroll, this)
-    this.$topbar = $(topbar)
-    this.selector = selector || 'li > a'
-    this.refresh()
-    this.$topbar.delegate(this.selector, 'click', processScroll)
-    $window.scroll(processScroll)
-    this.processScroll()
-  }
+			for ( i = offsets.length; i--; ) {
+				activeTarget != targets[i] && scrollTop >= offsets[i] && (!offsets[i + 1] || scrollTop <= offsets[i + 1]) && this.activateButton(targets[i])
+			}
+		},
+		activateButton : function(target) {
+			this.activeTarget = target
 
-  ScrollSpy.prototype = {
+			this.$topbar.find(this.selector).parent('.active').removeClass('active')
 
-      refresh: function () {
-        this.targets = this.$topbar.find(this.selector).map(function () {
-          var href = $(this).attr('href')
-          return /^#\w/.test(href) && $(href).length ? href : null
-        })
+			this.$topbar.find(this.selector + '[href="' + target + '"]').parent('li').addClass('active')
+		}
+	}
 
-        this.offsets = $.map(this.targets, function (id) {
-          return $(id).offset().top
-        })
-      }
+	/* SCROLLSPY PLUGIN DEFINITION
+	 * =========================== */
 
-    , processScroll: function () {
-        var scrollTop = $window.scrollTop() + 10
-          , offsets = this.offsets
-          , targets = this.targets
-          , activeTarget = this.activeTarget
-          , i
+	$.fn.scrollSpy = function(options) {
+		var scrollspy = this.data('scrollspy')
 
-        for (i = offsets.length; i--;) {
-          activeTarget != targets[i]
-            && scrollTop >= offsets[i]
-            && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
-            && this.activateButton( targets[i] )
-        }
-      }
+		if (!scrollspy) {
+			return this.each(function() {
+				$(this).data('scrollspy', new ScrollSpy(this, options))
+			})
+		}
 
-    , activateButton: function (target) {
-        this.activeTarget = target
+		if (options === true) {
+			return scrollspy
+		}
 
-        this.$topbar
-          .find(this.selector).parent('.active')
-          .removeClass('active')
+		if ( typeof options == 'string') {
+			scrollspy[options]()
+		}
 
-        this.$topbar
-          .find(this.selector + '[href="' + target + '"]')
-          .parent('li')
-          .addClass('active')
-      }
+		return this
+	}
 
-  }
-
-  /* SCROLLSPY PLUGIN DEFINITION
-   * =========================== */
-
-  $.fn.scrollSpy = function( options ) {
-    var scrollspy = this.data('scrollspy')
-
-    if (!scrollspy) {
-      return this.each(function () {
-        $(this).data('scrollspy', new ScrollSpy( this, options ))
-      })
-    }
-
-    if ( options === true ) {
-      return scrollspy
-    }
-
-    if ( typeof options == 'string' ) {
-      scrollspy[options]()
-    }
-
-    return this
-  }
-
-  $(document).ready(function () {
-    $('body').scrollSpy('[data-scrollspy] li > a')
-  })
-
-}( window.jQuery || window.ender );
+	$(document).ready(function() {
+		$('body').scrollSpy('[data-scrollspy] li > a')
+	})
+}(window.jQuery || window.ender); 

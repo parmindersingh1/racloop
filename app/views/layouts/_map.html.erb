@@ -197,11 +197,11 @@
 		marker.setMap(map);
 		directionsDisplay.setMap(map);
 		if(attempt==0)
-		{
+		{			
 		  google.maps.event.addListenerOnce(map, 'idle', function(){		      
 			requestRoute();
 	      });
-	     }
+	    }
 	  	hideInitializing();
 
 	}
@@ -322,6 +322,7 @@
 	}
 
 	function errorDisplay(message) {
+		attempt=1;
 		hideInitializing();
 		err.innerHTML = message;
 		$("#error_view").slideDown("slow");
@@ -345,7 +346,12 @@
 				}
 				callDialog(first, second);
 			}
-		}, 1000);
+			
+			else if((first == "") && (second == ""))
+			{
+				attempt=1;
+			}
+		}, 1200);
 	}
 
 
