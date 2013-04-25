@@ -32,7 +32,7 @@ include Tire::Model::Persistence
           filter('geo_distance', {:distance => '20km', 
         :to_location => {'lat' => params[:to_lat].to_f, 'lon' => params[:to_lon].to_f}}
               ) if params[:to_lat] && params[:to_lon]
-          filter :term, :user_id => params[:user_id]            
+                   
         end
     end
      

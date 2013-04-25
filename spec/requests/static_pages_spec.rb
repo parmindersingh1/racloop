@@ -6,18 +6,18 @@ describe "Static Pages" do
   subject {page}
   
   describe "Home page" do
-    before {visit root_path}
+    before {visit home_path}
     
-    it {should have_selector('a', text: 'People near you')}
-    it {should have_selector('a', text: 'My Responses (3)')}
+    it {should have_selector('a', :content=> 'People near you')}
+    it {should have_selector('a', :content=> 'My Responses (3)')}
    
-    it "should render form partial" do
-       page.should have_selector('form', action: '#')  
-       page.should have_selector('span', text: 'I need someone to drive me')        
+    it "should render form partial" do   
+          page.should have_selector('div', id: 'input_id')
+          # page.should have_selector('input[type=submit]')
     end   
     
     it "should render footer partial"  do
-      page.should have_selector('footer', text: 'Ezzie Infosystems 2013')            
+      page.should have_selector('footer', text: 'Ezzie Infosystems 2013')       
     end                                                                  
     
     it "should render message partial"  do
@@ -25,7 +25,7 @@ describe "Static Pages" do
     end
     
     it "should render sidebar partial"  do
-       page.should have_selector('h5', text: 'My Requests')                  
+       page.should have_selector('div', id: 'well_id')                   
     end
     
      it "should render map partial"  do
@@ -87,6 +87,20 @@ describe "Static Pages" do
     
     it {should have_selector('h1', text: 'Learn')}
     it {should have_selector('p',  text: 'This is our learn page')}
+  end
+  
+  describe "Main page" do
+    before {visit root_path}
+    
+     it "should render message partial"  do
+         page.should have_selector('h1', text: 'Share a Drive')    
+         page.should have_selector('p', text: 'Meet new people, Make new friends and Drive together. Help in promoting Clean and Pollution free World.')           
+    end
+    
+     it "should render map2 partial"  do
+       page.should have_selector('div', id: 'map_canvas1')                  
+    end
+        
   end
 end
 

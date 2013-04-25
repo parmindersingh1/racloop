@@ -22,7 +22,7 @@ class StaticPages
           filter :range, date_at: {gte: Time.zone.now+1.hours }  
           filter :range, date_at: {lte: params[:search_futuretime]}
           filter :range, date_at: {gte: params[:search_pasttime]}
-          filter  :bool,:must_not=>{:term=>{ :user_id => params[:user_id]}}
+          filter :bool,:must_not=>{:term=>{ :user_id => params[:user_id]}}
           filter('geo_distance', {:distance =>  params[:distance], 
         :from_location => {'lat' => params[:from_lat].to_f, 'lon' => params[:from_lon].to_f}}
               ) if params[:from_lat] && params[:from_lon]
