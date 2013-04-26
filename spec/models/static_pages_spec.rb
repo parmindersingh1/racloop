@@ -64,37 +64,37 @@ describe StaticPages do
       describe "search method" do
         it "should return result " do
           result = StaticPages.search(@params)
-          result.count.should == 2
+            assert_equal 2, result.count
           result.first.user_name.should == @user_3.user_name
         end      
         
         it "should return nearby result" do
           result = StaticPages.search_nearby(:user_id => "100005196784043",:lat => "30.732999",:lon => "76.77116260000003",:date_at=>"2013-04-30T01:00:00" )
-          result.count.should == 2
+          assert_equal 2, result.count
           result.first.user_name.should == @user_3.user_name
         end    
         
         it "should return history result" do
           result = StaticPages.search_history(:user_id => "100005196784043")
-          result.count.should == 1
+          assert_equal 1, result.count
           result.first.user_name.should == @user_1.user_name
         end     
         
         it "should return request result" do
           result = StaticPages.search_request(:user_id => "100002283355067")
-          result.count.should == 1
+          assert_equal 1, result.count
           result.first.user_name.should == @user_3.user_name
         end     
         
         it "should return near result" do
           result = StaticPages.search_near(:user_id => "100005196784043",:lat => "30.732999",:lon => "76.77116260000003" )
-          result.count.should == 2
+          assert_equal 2, result.count
           result.first.user_name.should == @user_3.user_name
         end      
         
         it "should return no of requests result" do
           result = StaticPages.search_no_of_requests(:user_id => "100005196784043")
-          result.count.should == 1
+          assert_equal 1, result.count
           result.first.user_name.should == @user_1.user_name
         end   
       end

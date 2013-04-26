@@ -27,7 +27,7 @@ describe UserInformation do
       describe "users" do
         it "should find users by id" do
           result = UserInformation.search(:user_id => "100005196784043")
-          result.count.should == 1
+          assert_equal 1, result.count
           result.first.user_name.should == @user_1.user_name
         end        
       end

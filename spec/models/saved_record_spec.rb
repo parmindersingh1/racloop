@@ -33,13 +33,13 @@ describe SavedRecord do
       describe "saved records" do
         it "should return result by id" do
           result = SavedRecord.search(:user_id => "100005196784043")
-          result.count.should == 1
+          assert_equal 1, result.count
           result.first.user_name.should == @user_1.user_name
         end      
         
         it "should return result" do
           result = SavedRecord.search_check(:user_id => "100005735493567",:from_lat => "30.732999",:from_lon => "76.77116260000003", :to_lat=> "28.617988", :to_lon => "77.27937199999997")
-          result.count.should == 1
+          assert_equal 1, result.count
           result.first.user_name.should == @user_2.user_name
         end          
       end
