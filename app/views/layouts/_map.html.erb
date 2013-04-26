@@ -8,7 +8,12 @@
 	<center>
 		<p>
 			Save Route for later use: &nbsp;&nbsp;&nbsp;
-			<input id="save_button" type="button" class="btn primary" value="Save" >
+			<input id="save_button" type="button" class="btn primary" value="   Save   " >
+			&nbsp;&nbsp;&nbsp;
+			<button type="button" class="btn" id="cancel_btn">
+				Cancel
+			</button>
+
 		</p>
 	</center>
 </div>
@@ -34,17 +39,18 @@
 	var country2 = "";
 	var markersArray = [];
 	var attempt = 0;
+	var number = 0;
 
 	initGeolocation();
 	callauto();
 
-	$(document).on("click", "#table_history tr td:not(:last-child)", function() {		
+	$(document).on("click", "#table_history tr td:not(:last-child)", function() {
 		var first = $(this).parent("tr").find("td").slice(1, 2).text();
 		var second = $(this).parent("tr").find("td").slice(2, 3).text();
+		number = document.getElementById('table_history').rows[0].cells.length;
 		callDialog(first, second);
 	});
 
-   
 	function callDialog(first, second) {
 		input1.value = first;
 		input2.value = second;
@@ -196,13 +202,12 @@
 		marker.setPosition(coords);
 		marker.setMap(map);
 		directionsDisplay.setMap(map);
-		if(attempt==0)
-		{			
-		  google.maps.event.addListenerOnce(map, 'idle', function(){		      
-			requestRoute();
-	      });
-	    }
-	  	hideInitializing();
+		if (attempt == 0) {
+			google.maps.event.addListenerOnce(map, 'idle', function() {
+				requestRoute();
+			});
+		}
+		hideInitializing();
 
 	}
 
@@ -234,13 +239,10 @@
 				$("#time_taken").val(result.routes[0].legs[0].duration.value);
 
 				directionsDisplay.setDirections(result);
-                if(attempt != 0)
-                {
-				 $("#save_route").fadeIn("fast");
-				 $("#map_canvas").css("margin-bottom", "2px");
-				}
-				else
-				{
+				if ((attempt != 0) && (number != 3)) {
+					$("#save_route").fadeIn("fast");
+					$("#map_canvas").css("margin-bottom", "2px");
+				} else {
 					attempt = 1;
 				}
 			} else {
@@ -250,7 +252,6 @@
 			markersArray = [];
 			hideInitializing();
 		});
-
 	}
 
 	function getlonglat(address) {
@@ -287,7 +288,7 @@
 		var loc2 = getlonglat(address2);
 		setTimeout(function() {
 			calcRoute(loc1, loc2);
-		}, 1500);
+		}, 2000);
 
 	}
 
@@ -322,7 +323,7 @@
 	}
 
 	function errorDisplay(message) {
-		attempt=1;
+		attempt = 1;
 		hideInitializing();
 		err.innerHTML = message;
 		$("#error_view").slideDown("slow");
@@ -338,27 +339,25 @@
 		setTimeout(function() {
 			var first = $("#request_from").val();
 			var second = $("#request_to").val();
-			if ((first != "") && (second != "")) {				
+			if ((first != "") && (second != "")) {
 				if ($("#request_car").val() == "car") {
 					document.getElementById('optionsCheckboxes_car').checked = true;
 				} else {
 					document.getElementById('optionsCheckboxes_notcar').checked = true;
 				}
 				callDialog(first, second);
-			}
-			
-			else if((first == "") && (second == ""))
-			{
-				attempt=1;
+			} else if ((first == "") && (second == "")) {
+				attempt = 1;
 			}
 		}, 1200);
 	}
 
 
-	$(document).ready(function() {
-		//requestRoute();
+	$(document).on("click", "#cancel_btn", function() {
+		$("#save_route").fadeOut("fast");
+		$("#map_canvas").css("margin-bottom", "");
 	});
-	
+
 	function hideInitializing() {
 		$("#loading_map").hide();
 	}

@@ -65,7 +65,7 @@ function history_click() {
 		hideLoading();
 	}, 8000);
 	$("li").removeClass("active");
-	$(this).parent().addClass("active");
+	$("#history").parent().addClass("active");
 	$.get("/history", function(data) {
 		hideLoading();
 		$(".tab-content").empty();
