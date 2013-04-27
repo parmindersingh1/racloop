@@ -41,14 +41,8 @@ do
 
 for j in {1..7}
 do
-echo "---------$inc"
 
-echo "-----------$i"
-
-echo "-----------$j"
 num=$(($inc+$i + $j))
-
-echo "-----------$num"
 a=$(date -u +"%Y-%m-%dT%H:%M:%S" --date="$num hour")
 
 if [[ $i -ge $j ]]

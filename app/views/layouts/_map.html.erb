@@ -47,7 +47,14 @@
 	$(document).on("click", "#table_history tr td:not(:last-child)", function() {
 		var first = $(this).parent("tr").find("td").slice(1, 2).text();
 		var second = $(this).parent("tr").find("td").slice(2, 3).text();
-		number = document.getElementById('table_history').rows[0].cells.length;
+		number = document.getElementById('table_history').rows[0].cells.length;		
+		callDialog(first, second);
+	});
+	
+	$(document).on("click", "#table_savelist tr td:not(:last-child)", function() {
+		var first = $(this).parent("tr").find("td").slice(1, 2).text();
+		var second = $(this).parent("tr").find("td").slice(2, 3).text();
+		number = document.getElementById('table_savelist').rows[0].cells.length;
 		callDialog(first, second);
 	});
 
@@ -94,7 +101,8 @@
 		country1 = "";
 		country2 = "";
 		callauto();
-
+        $("#save_route").fadeOut("fast");
+		$("#map_canvas").css("margin-bottom", "");
 	});
 
 	$(document).on("focus", "#from", function() {
@@ -166,7 +174,6 @@
 	}
 
 	function changeMarkerPosition(loc) {
-
 		var latlng = new google.maps.LatLng(loc[0], loc[1]);
 		marker.setPosition(latlng);
 		map.setCenter(latlng);
@@ -186,7 +193,6 @@
 	}
 
 	function success(position) {
-
 		geocoder = new google.maps.Geocoder();
 		directionsDisplay = new google.maps.DirectionsRenderer();
 		coords = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -204,7 +210,9 @@
 		directionsDisplay.setMap(map);
 		if (attempt == 0) {
 			google.maps.event.addListenerOnce(map, 'idle', function() {
-				requestRoute();
+				setTimeout(function() {
+					requestRoute();
+				}, 1500);
 			});
 		}
 		hideInitializing();
@@ -239,7 +247,7 @@
 				$("#time_taken").val(result.routes[0].legs[0].duration.value);
 
 				directionsDisplay.setDirections(result);
-				if ((attempt != 0) && (number != 3)) {
+				if ((attempt != 0) && (number != 5)) {
 					$("#save_route").fadeIn("fast");
 					$("#map_canvas").css("margin-bottom", "2px");
 				} else {
@@ -259,7 +267,6 @@
 		geocoder.geocode({
 			'address' : address
 		}, function(results, status) {
-
 			if (status == google.maps.GeocoderStatus.OK) {
 				loc3[0] = results[0].geometry.location.lat();
 				loc3[1] = results[0].geometry.location.lng();
@@ -288,8 +295,7 @@
 		var loc2 = getlonglat(address2);
 		setTimeout(function() {
 			calcRoute(loc1, loc2);
-		}, 2000);
-
+		}, 3000);
 	}
 
 	function fail() {
@@ -336,20 +342,18 @@
 	}
 
 	function requestRoute() {
-		setTimeout(function() {
-			var first = $("#request_from").val();
-			var second = $("#request_to").val();
-			if ((first != "") && (second != "")) {
-				if ($("#request_car").val() == "car") {
-					document.getElementById('optionsCheckboxes_car').checked = true;
-				} else {
-					document.getElementById('optionsCheckboxes_notcar').checked = true;
-				}
-				callDialog(first, second);
-			} else if ((first == "") && (second == "")) {
-				attempt = 1;
+		var first = $("#request_from").val();
+		var second = $("#request_to").val();
+		if ((first != "") && (second != "")) {
+			if ($("#request_car").val() == "car") {
+				document.getElementById('optionsCheckboxes_car').checked = true;
+			} else {
+				document.getElementById('optionsCheckboxes_notcar').checked = true;
 			}
-		}, 1200);
+			callDialog(first, second);
+		} else if ((first == "") && (second == "")) {
+			attempt = 1;
+		}
 	}
 
 

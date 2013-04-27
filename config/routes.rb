@@ -36,6 +36,8 @@ Racloop::Application.routes.draw do
   match "/saveroute",to:"static_pages#saveroute"
   
   match "/savelist",to:"static_pages#savelist"
+  
+  match "/destroy_favourite",to:"static_pages#destroy_favourite" 
   # match "/users",   to:"user_informations#users"
  
 # match "/help" "static_pages/help"

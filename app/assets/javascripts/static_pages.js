@@ -79,18 +79,24 @@ $(document).on("click", "#history", function(event) {
 });
 
 $(document).on("click", "#savelist", function(event) {
+	savelist_display();
+});
+
+function savelist_display()
+{
 	showLoading();
 	setTimeout(function() {
 		hideLoading();
 	}, 8000);
 	$("li").removeClass("active");
-	$(this).parent().addClass("active");
+	$("#savelist").parent().addClass("active");
 	$.get("/savelist", function(data) {
 		hideLoading();
 		$(".tab-content").empty();
 		$(".tab-content").html(data);
 	});
-});
+	
+}
 
 $(document).on("click", "#invisible", function(event) {
 	showLoading();
@@ -217,7 +223,10 @@ $(document).on("click", "#reset_btn", function() {
 	}, 1500);
 	setTimeout(function() {
 		callPeople();
+		setTime();
+		setDate();
 	}, 1200);
+	
 });
 
 $(document).on("mouseenter", "#table_history tbody tr", function() {
@@ -230,6 +239,22 @@ $(document).on("mouseenter", "#table_history tbody tr", function() {
 
 $(document).on("mouseleave", "#table_history tbody tr", function() {
 	$(this).find("td").slice(0, 4).css({
+		"background-color" : "#FFFFFF",
+		"cursor" : "pointer"
+	});
+
+});
+
+$(document).on("mouseenter", "#table_savelist tbody tr", function() {
+	$(this).find("td").slice(0, 3).css({
+		"background-color" : "#F2F2F2",
+		"cursor" : "pointer"
+	});
+
+});
+
+$(document).on("mouseleave", "#table_savelist tbody tr", function() {
+	$(this).find("td").slice(0, 3).css({
 		"background-color" : "#FFFFFF",
 		"cursor" : "pointer"
 	});
@@ -258,7 +283,7 @@ $(document).on("click", "#delete", function() {
 						id : id
 					}, function(data) {
 					});
-					$("#reset_btn").click();
+					// $("#reset_btn").click();
 				}
 			},
 			'No' : {
@@ -289,6 +314,38 @@ $(document).on("click", "#delete_history", function() {
 						}, 8000);
 						setTimeout(function() {
 							history_click();
+						}, 1500);
+					});
+				}
+			},
+			'No' : {
+				'class' : 'gray',
+				'action' : function() {
+				}	// Nothing to do in this case. You can as well omit the action property.
+			}
+		}
+	});
+
+});
+
+$(document).on("click", "#delete_savelist", function() {
+	$.confirm({
+		'title' : 'Delete Confirmation',
+		'message' : 'You are about to delete this item. <br />It cannot be restored at a later time! Continue?',
+		'buttons' : {
+			'Yes' : {
+				'class' : 'blue',
+				'action' : function() {
+					var id = $("#delete_savelist").attr("value");
+					$.get("/destroy_favourite", {
+						id : id
+					}, function(data) {
+						showLoading();
+						setTimeout(function() {
+							hideLoading();
+						}, 8000);
+						setTimeout(function() {	
+							savelist_display()						
 						}, 1500);
 					});
 				}
@@ -390,6 +447,11 @@ $(document).on("click", "#save_button", function() {
 });
 
 $(document).ready(function() {
+	setTime();
+});
+
+function setTime()
+{
 	var a_p = "";
 	var d = new Date();
 	var curr_hour = (d.getHours() + 1);
@@ -414,5 +476,24 @@ $(document).ready(function() {
 	}
 
 	$("#timepicker3").val((curr_hour < 10 ? '0' + curr_hour : curr_hour) + ":" + curr_min + " " + a_p);
+	
+}
+function setDate()
+{
+	var nowTemp = new Date();
+	var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
 
-});
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth() + 1;
+	//January is 0!
+	var yyyy = today.getFullYear();
+	if (dd < 10) {
+		dd = '0' + dd
+	}
+	if (mm < 10) {
+		mm = '0' + mm
+	}
+	today = mm + '/' + dd + '/' + yyyy;
+	$('.datepicker').val(today);
+}

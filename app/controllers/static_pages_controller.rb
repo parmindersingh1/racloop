@@ -43,40 +43,44 @@ class StaticPagesController < ApplicationController
   end
 
   def details
-    puts"---------------in details--------------------------#{params}"
-    params[:user_id]=current_user.identifier
-    params[:user_name]=current_user.profile.name
-    params[:date_at]=Time.zone.parse(params[:date_at]).utc
-    distance=((params[:distance].to_i*ENV["DISTANCE"].to_i)/100).to_s+"km"
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#{distance}"
-    @no_of_requests=StaticPages.search_no_of_requests(params).results.length
-    puts "&&&&&&&&&&&&&&&&&&&&&&&&&&#{@no_of_requests}"
-    unless @no_of_requests >= ENV["MAX_REQUESTS"].to_i
-      puts "----------------------------000000000#{ENV["MAX_REQUESTS"]}"
-      info=params.except(:controller, :action, :distance)
-      puts"------------------------------$$$$$$$$$-----------#{info}"
+    if authenticated?
+      puts"---------------in details--------------------------#{params}"
+      params[:user_id]=current_user.identifier
+      params[:user_name]=current_user.profile.name
+      params[:date_at]=Time.zone.parse(params[:date_at]).utc
+      distance=((params[:distance].to_i*ENV["DISTANCE"].to_i)/100).to_s+"km"
+      puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#{distance}"
+      @no_of_requests=StaticPages.search_no_of_requests(params).results.length
+      puts "&&&&&&&&&&&&&&&&&&&&&&&&&&#{@no_of_requests}"
+      unless @no_of_requests >= ENV["MAX_REQUESTS"].to_i
+        puts "----------------------------000000000#{ENV["MAX_REQUESTS"]}"
+        info=params.except(:controller, :action, :distance)
+        puts"------------------------------$$$$$$$$$-----------#{info}"
 
-      if StaticPages.create(info)
-        puts "(((((((((((((((((((((((((((SAVED)))))))))))))))))))))))))))"
+        if StaticPages.create(info)
+          puts "(((((((((((((((((((((((((((SAVED)))))))))))))))))))))))))))"
+        else
+          puts "(((((((((((((((((((ERROR)))))))))))))))))))"
+        end
+        params[:distance]=distance
+        params[:search_futuretime]=params[:date_at]+ENV["TIME"].to_i.hours
+        params[:search_pasttime]=params[:date_at]-ENV["TIME"].to_i.hours
+        lat_long1=params[:from_location].split(",");
+        params[:from_lat]=lat_long1[0];
+        params[:from_lon]=lat_long1[1];
+        lat_long2=params[:to_location].split(",");
+        params[:to_lat]=lat_long2[0];
+        params[:to_lon]=lat_long2[1];
+        info2=params.except(:from_location,:to_location);
+        puts "+++++++++++++++++++++++++++++++++++++++INFO2  #{info2}"
+        @near_loc=StaticPages.search(info2)
+        puts "??????????????????????????????#{@near_loc.results}"
+        render :partial=> "people"
       else
-        puts "(((((((((((((((((((ERROR)))))))))))))))))))"
+        render :text=> "No"
       end
-      params[:distance]=distance
-      params[:search_futuretime]=params[:date_at]+ENV["TIME"].to_i.hours
-      params[:search_pasttime]=params[:date_at]-ENV["TIME"].to_i.hours
-      lat_long1=params[:from_location].split(",");
-      params[:from_lat]=lat_long1[0];
-      params[:from_lon]=lat_long1[1];
-      lat_long2=params[:to_location].split(",");
-      params[:to_lat]=lat_long2[0];
-      params[:to_lon]=lat_long2[1];
-      info2=params.except(:from_location,:to_location);
-      puts "+++++++++++++++++++++++++++++++++++++++INFO2  #{info2}"
-      @near_loc=StaticPages.search(info2)
-      puts "??????????????????????????????#{@near_loc.results}"
-      render :partial=> "people"
     else
-      render :text=> "No"
+      render "static_pages/main"
     end
   end
 
@@ -98,29 +102,41 @@ class StaticPagesController < ApplicationController
   end
 
   def history
-    params[:user_id]=current_user.identifier;
-    info=params.except(:controller, :action);
-    puts "%%%%%%%%%%#{info}"
-    @history=StaticPages.search_history(info);
-    render :partial=> "history"
+    if authenticated?
+      params[:user_id]=current_user.identifier;
+      info=params.except(:controller, :action);
+      puts "%%%%%%%%%%#{info}"
+      @history=StaticPages.search_history(info);
+      render :partial=> "history"
+    else
+      render "static_pages/main"
+    end
   end
 
   def people
-    puts "********************search$$$$$$$$$$#{params}"
-    params[:user_id]=current_user.identifier
-    info=params.except(:controller, :action);
-    puts "**********************#{info}"
-    @near_loc=StaticPages.search_nearby(info)
-    puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&#{@near_loc.results}"
-    render :partial=> "people"
+    if authenticated?
+      puts "********************search$$$$$$$$$$#{params}"
+      params[:user_id]=current_user.identifier
+      info=params.except(:controller, :action);
+      puts "**********************#{info}"
+      @near_loc=StaticPages.search_nearby(info)
+      puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&#{@near_loc.results}"
+      render :partial=> "people"
+    else
+      render "static_pages/main"
+    end
   end
 
   def requests
-    params[:user_id]=current_user.identifier;
-    info=params.except(:controller, :action);
-    @requests=StaticPages.search_request(info);
-    puts "requests &&&&&&&&&&&&&&&&&&#{@requests.results}"
-    render :partial => "layouts/sidebar"
+    if authenticated?
+      params[:user_id]=current_user.identifier;
+      info=params.except(:controller, :action);
+      @requests=StaticPages.search_request(info);
+      puts "requests &&&&&&&&&&&&&&&&&&#{@requests.results}"
+      render :partial => "layouts/sidebar"
+    else
+      render "static_pages/main"
+    end
   end
 
   def destroy
@@ -129,44 +145,59 @@ class StaticPagesController < ApplicationController
     StaticPages.tire.index.remove @Record
     render :json=>""
   end
+  
+  def destroy_favourite
+    puts "uuuuuuuuuuuuuuuuuuuuu#{params}"
+    @Record = SavedRecord.find(params[:id])
+    SavedRecord.tire.index.remove @Record
+    render :json=>""
+  end
 
   def saveroute
-    puts "uuuuuuuuuuuuuuuuuuuuu#{params}"
-    params[:user_id]=current_user.identifier
-    params[:user_name]=current_user.profile.name
-    info=params.except(:controller, :action);
+    if authenticated?
+      puts "uuuuuuuuuuuuuuuuuuuuu#{params}"
+      params[:user_id]=current_user.identifier
+      params[:user_name]=current_user.profile.name
+      info=params.except(:controller, :action);
 
-    lat_long1=params[:from_location].split(",");
-    params[:from_lat]=lat_long1[0];
-    params[:from_lon]=lat_long1[1];
-    lat_long2=params[:to_location].split(",");
-    params[:to_lat]=lat_long2[0];
-    params[:to_lon]=lat_long2[1];
-    puts "&&&&&&&&&&&&&&&&&&&&&&^^^^^^^^^^^^^^^^^^^^^^^#{params}"
-    info2=params.except(:from_location,:to_location);
-    @savedresult=SavedRecord.search_check(info2)
-    puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#{@savedresult.results}"
+      lat_long1=params[:from_location].split(",");
+      params[:from_lat]=lat_long1[0];
+      params[:from_lon]=lat_long1[1];
+      lat_long2=params[:to_location].split(",");
+      params[:to_lat]=lat_long2[0];
+      params[:to_lon]=lat_long2[1];
+      puts "&&&&&&&&&&&&&&&&&&&&&&^^^^^^^^^^^^^^^^^^^^^^^#{params}"
+      info2=params.except(:from_location,:to_location);
+      @savedresult=SavedRecord.search_check(info2)
+      puts "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#{@savedresult.results}"
 
-    if @savedresult.results.blank?
-      if (SavedRecord.create(info))
-        puts "(((((((((((((((((((((((((((SAVED)))))))))))))))))))))))))))"
-        render :text=>"Done"
+      if @savedresult.results.blank?
+        if (SavedRecord.create(info))
+          puts "(((((((((((((((((((((((((((SAVED)))))))))))))))))))))))))))"
+          render :text=>"Done"
+        else
+          puts "(((((((((((((((((((ERROR)))))))))))))))))))"
+          render :text=>"Error"
+        end
       else
-        puts "(((((((((((((((((((ERROR)))))))))))))))))))"
-        render :text=>"Error"
+        render :text=>"Record already exists"
       end
     else
-      render :text=>"Record already exists"
+      render "static_pages/main"
     end
   end
 
   def savelist
-    puts "uuuuuuuuuuuuuuuuuuuuu#{params}"
-    params[:user_id]=current_user.identifier
-    info=params.except(:controller, :action);
-    @saved=SavedRecord.search(info)
-    puts "requests &&&&&&&&&&&&&&&&&&#{@saved.results}"
-    render :partial => "layouts/savelist"
+    if authenticated?
+      puts "uuuuuuuuuuuuuuuuuuuuu#{params}"
+      params[:user_id]=current_user.identifier
+      info=params.except(:controller, :action);
+      @saved=SavedRecord.search(info)
+      puts "requests &&&&&&&&&&&&&&&&&&#{@saved.results}"
+      render :partial => "layouts/savelist"
+    else
+      render "static_pages/main"
+    end
   end
 
 end

@@ -4,12 +4,13 @@
     </div>
 	
 					<%unless @saved.empty?%>
-					<table class="condensed-table" id="table_history">
+					<table class="condensed-table" id="table_savelist">
 						<thead>
 							<tr>
 								<th>Name</th>
 								<th>From</th>
-								<th>To</th>								
+								<th>To</th>	
+								<th>Delete<th>							
 							</tr>
 						</thead>
 						<tbody>
@@ -18,7 +19,8 @@
 						<tr>
 							   	<td><%=list.user_name%></td>
 								<td><%=list.from%></td>
-								<td><%=list.to%></td>																		
+								<td><%=list.to%></td>		
+								<td><a class="close" id ="delete_savelist" value= "<%= list.id%>" href="#">×</a></td>																
 					    </tr>
 						  <%end%>
 											
