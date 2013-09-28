@@ -1,6 +1,7 @@
 class StaticPagesController < ApplicationController
+  before_filter :require_authentication, :only => [:home,:details,:history,:people,:requests,:saveroute,:savelist]
   def home
-    if authenticated?
+    # if authenticated?
       puts ".............in userinformation after login"
 
       info={ :user_name=>current_user.profile.name,
@@ -20,9 +21,9 @@ class StaticPagesController < ApplicationController
       else
         puts "*************not blank *************"
       end
-    else
-      render "static_pages/main"
-    end
+    # else
+      # render "static_pages/main"
+    # end
 
   end
 
@@ -43,7 +44,7 @@ class StaticPagesController < ApplicationController
   end
 
   def details
-    if authenticated?
+    # if authenticated?
       puts"---------------in details--------------------------#{params}"
       params[:user_id]=current_user.identifier
       params[:user_name]=current_user.profile.name
@@ -79,9 +80,9 @@ class StaticPagesController < ApplicationController
       else
         render :text=> "No"
       end
-    else
-      render "static_pages/main"
-    end
+    # else
+      # render "static_pages/main"
+    # end
   end
 
   def main
@@ -102,19 +103,19 @@ class StaticPagesController < ApplicationController
   end
 
   def history
-    if authenticated?
+    # if authenticated?
       params[:user_id]=current_user.identifier;
       info=params.except(:controller, :action);
       puts "%%%%%%%%%%#{info}"
       @history=StaticPages.search_history(info);
       render :partial=> "history"
-    else
-      render "static_pages/main"
-    end
+    # else
+      # render "static_pages/main"
+    # end
   end
 
   def people
-    if authenticated?
+    # if authenticated?
       puts "********************search$$$$$$$$$$#{params}"
       params[:user_id]=current_user.identifier
       info=params.except(:controller, :action);
@@ -122,21 +123,21 @@ class StaticPagesController < ApplicationController
       @near_loc=StaticPages.search_nearby(info)
       puts "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&#{@near_loc.results}"
       render :partial=> "people"
-    else
-      render "static_pages/main"
-    end
+    # else
+      # render "static_pages/main"
+    # end
   end
 
   def requests
-    if authenticated?
+    # if authenticated?
       params[:user_id]=current_user.identifier;
       info=params.except(:controller, :action);
       @requests=StaticPages.search_request(info);
       puts "requests &&&&&&&&&&&&&&&&&&#{@requests.results}"
       render :partial => "layouts/sidebar"
-    else
-      render "static_pages/main"
-    end
+    # else
+      # render "static_pages/main"
+    # end
   end
 
   def destroy
@@ -154,7 +155,7 @@ class StaticPagesController < ApplicationController
   end
 
   def saveroute
-    if authenticated?
+    # if authenticated?
       puts "uuuuuuuuuuuuuuuuuuuuu#{params}"
       params[:user_id]=current_user.identifier
       params[:user_name]=current_user.profile.name
@@ -182,22 +183,22 @@ class StaticPagesController < ApplicationController
       else
         render :text=>"Record already exists"
       end
-    else
-      render "static_pages/main"
-    end
+    # else
+      # render "static_pages/main"
+    # end
   end
 
   def savelist
-    if authenticated?
+    # if authenticated?
       puts "uuuuuuuuuuuuuuuuuuuuu#{params}"
       params[:user_id]=current_user.identifier
       info=params.except(:controller, :action);
       @saved=SavedRecord.search(info)
       puts "requests &&&&&&&&&&&&&&&&&&#{@saved.results}"
       render :partial => "layouts/savelist"
-    else
-      render "static_pages/main"
-    end
+    # else
+      # render "static_pages/main"
+    # end
   end
 
 end
