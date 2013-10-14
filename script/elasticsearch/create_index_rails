@@ -1,9 +1,0 @@
-//run these commands one by one on console from project directory
-
-rake environment tire:import CLASS='StaticPages' FORCE=true
-
-rake environment tire:import CLASS='UserInformation' FORCE=true
-
-rake environment tire:import CLASS='SavedRecord' FORCE=true
-
-
